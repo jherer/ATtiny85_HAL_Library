@@ -15,9 +15,9 @@ void error_blink(uint8_t error_code) {
     while (1) {
         for (int i = 0; i < count; i++) {
             hal_gpio_write_port(error_led_id, 1);
-            _delay_ms(175);
+            _delay_ms(160);
             hal_gpio_write_port(error_led_id, 0);
-            _delay_ms(175);
+            _delay_ms(160);
         }
         for (int i = 0; i < 100; i++) {
             _delay_ms(10);

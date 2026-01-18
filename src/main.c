@@ -33,11 +33,14 @@ uint8_t get_error_code(error_t err) {
     case ERROR_PWM_CHANNEL_CONFLICT:    return 20;
     case ERROR_PWM_CHANNEL_A_IS_TOP:    return 21;
 
-    case ERROR_SPI_MODE_UNSUPPORTED:    return 22;
-    case ERROR_SPI_ROLE_UNSUPPORTED:    return 23;
-    case ERROR_SPI_CLOCK_UNSUPPORTED:   return 24;
-    case ERROR_SPI_CLOCK_INVALID:       return 25;
-    case ERROR_SPI_STROBE_NOT_ALLOWED:  return 26;
+    case ERROR_ADC_UNINITIALIZED:       return 22;
+    case ERROR_ADC_CHANNEL_UNSUPPORTED: return 23;
+
+    case ERROR_SPI_MODE_UNSUPPORTED:    return 25;
+    case ERROR_SPI_ROLE_UNSUPPORTED:    return 26;
+    case ERROR_SPI_CLOCK_UNSUPPORTED:   return 27;
+    case ERROR_SPI_CLOCK_INVALID:       return 28;
+    case ERROR_SPI_STROBE_NOT_ALLOWED:  return 29;
     default: return 255;
     }
 }

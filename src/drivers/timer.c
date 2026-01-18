@@ -7,6 +7,7 @@
 #include "hal_timer1.h"
 #include "_timer_internal.h"
 
+
 // HELPER FUNCTIONS
 
 static bool _top_valid(timer_mode_t mode) {   
@@ -26,7 +27,7 @@ static bool _ovf_valid(timer_mode_t mode) {
 }
 
 
-// TIMER 0
+// TIMER0 INTERNALS
 
 static error_t _timer0_set_mode(timer_mode_t mode) {
     uint8_t wgm_bits = 0;
@@ -47,13 +48,15 @@ static error_t _timer0_set_mode(timer_mode_t mode) {
     return ERROR_OK;
 }
 
+static error_t _timer0_set_top(uint8_t top) {
+    hal_timer0_set_output_compare_register_A(top);
+    return ERROR_OK;
+}
+
 static error_t _timer0_enable_callback(timer_event_t event, timer_mode_t mode, bool enable) {
     switch (event) {
     case TIMER_EVENT_COMPARE_A:
         hal_timer0_enable_interrupt_compA(enable);
-        break;
-    case TIMER_EVENT_COMPARE_B:
-        hal_timer0_enable_interrupt_compB(enable);
         break;
     case TIMER_EVENT_OVERFLOW:
         if (!_ovf_valid(mode)) {   
@@ -68,7 +71,7 @@ static error_t _timer0_enable_callback(timer_event_t event, timer_mode_t mode, b
 }
 
 
-// TIMER 1
+// TIMER 1 INTERNALS
 
 static error_t _timer1_set_mode(timer_mode_t mode) {
     switch (mode) {
@@ -88,13 +91,16 @@ static error_t _timer1_set_mode(timer_mode_t mode) {
     return ERROR_OK;
 }
 
+static error_t _timer1_set_top(uint8_t top) {
+    hal_timer1_set_output_compare_register_C(top);
+    hal_timer1_set_output_compare_register_A(top);
+    return ERROR_OK;
+}
+
 static error_t _timer1_enable_callback(timer_event_t event, timer_mode_t mode, bool enable) {
     switch (event) {
     case TIMER_EVENT_COMPARE_A:
         hal_timer1_enable_interrupt_compA(enable);
-        break;
-    case TIMER_EVENT_COMPARE_B:
-        hal_timer1_enable_interrupt_compB(enable);
         break;
     case TIMER_EVENT_OVERFLOW:
         if (!_ovf_valid(mode)) {   
@@ -107,7 +113,6 @@ static error_t _timer1_enable_callback(timer_event_t event, timer_mode_t mode, b
     }
     return ERROR_OK;
 }
-
 
 
 // SHARED TIMER RESOURCES
@@ -171,11 +176,10 @@ error_t timer_set_top(timer_id_t id, uint8_t top) {
     }
     switch(id) {
     case TIMER_ID_0:
-        hal_timer0_set_output_compare_register_A(top);
+        _timer0_set_top(id);
         return ERROR_OK;
     case TIMER_ID_1:
-        hal_timer1_set_output_compare_register_C(top);
-        hal_timer1_set_output_compare_register_A(top);
+        _timer1_set_top(id);
         return ERROR_OK;
     default:
         return ERROR_TIMER_ID_UNSUPPORTED;
@@ -210,9 +214,6 @@ error_t timer_set_callback(timer_id_t id, timer_event_t event, timer_callback_t 
     switch (event) {
     case TIMER_EVENT_COMPARE_A:
         timer_states[id].compareA_cb = cb;
-        break;
-    case TIMER_EVENT_COMPARE_B:
-        timer_states[id].compareB_cb = cb;
         break;
         
     case TIMER_EVENT_OVERFLOW:
@@ -283,28 +284,15 @@ ISR(TIMER0_COMPA_vect) {
     }
 }
 
-ISR(TIMER0_COMPB_vect) {
-    timer_callback_t cb = timer_states[TIMER_ID_0].compareB_cb;
-    if (cb != NULL) {
-        cb();
-    }
-}
-
 ISR(TIMER0_OVF_vect) {
     timer_callback_t cb = timer_states[TIMER_ID_0].overflow_cb;
     if (cb != NULL) {
         cb();
     }
 }
+
 ISR(TIMER1_COMPA_vect) {
     timer_callback_t cb = timer_states[TIMER_ID_1].compareA_cb;
-    if (cb != NULL) {
-        cb();
-    }
-}
-
-ISR(TIMER1_COMPB_vect) {
-    timer_callback_t cb = timer_states[TIMER_ID_1].compareB_cb;
     if (cb != NULL) {
         cb();
     }

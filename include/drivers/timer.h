@@ -22,7 +22,6 @@ typedef void (*timer_callback_t)(void);
 
 typedef enum {
     TIMER_EVENT_COMPARE_A,
-    TIMER_EVENT_COMPARE_B,
     TIMER_EVENT_OVERFLOW,
 } timer_event_t;
 
