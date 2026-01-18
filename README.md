@@ -1,17 +1,23 @@
 # ATtiny85 HAL Library
 ## Overview
 
-This is a library for ATtiny85 microcontrollers, a cheap, popular,
-and relatively simple microcontroller compatible with the Arduino ecosystem. The library is intended to be a general purpose replacement to the Arduino library.
+This is a library for ATtiny85 microcontrollers, a cheap, popular, and relatively simple microcontroller compatible with the Arduino ecosystem. The library is a general purpose replacement for the Arduino library that uses the principles of a [Hardware Abstraction Layer](https://en.wikipedia.org/wiki/Hardware_abstraction) (HAL).
 
 Why not use the Arduino library if it already exists?
 
-1. To unlock features that are simplified by the Arduino library without relying on direct bit manipulation. Often you would use pinMode and then a bunch of bitwise operations, which in addition to looking ugly, is a poor example of [abstraction](https://en.wikipedia.org/wiki/Abstraction_(computer_science)).
+1. To unlock features that the Arduino library glosses over, without breaking abstraction.
+2. For educational experience, to learn how to manage hardware abstractions and to learn about some ATtiny85/general microcontroller features.
 
-2. As a learning experience, to educate myself on how to manage levels of abstraction for an embedded systems project.
+## What is abstraction?
+[Abstraction](https://en.wikipedia.org/wiki/Abstraction_(computer_science)) separates the code responsible for specific individual actions from the code responsible for general, purposeful combinations of those actions. Using abstraction makes code reusable for different hardware implementations. Abstract code is also easy to understand and reuse for different project requirements.
+
+For example, to show an image on an LED screen, you should separate the code for *how* to display an image from the code for *what* image to display. *How* to change the pixel colors can depend on the hardware, and the user should not have to worry about that when they choose *what* image to display. If the hardware changes, then only the *how* part needs to be swapped for a different implementation. You can keep the names and parameters the same or similar in the new implementation, to the extent that the new hardware has the same features.
+
+In the Arduino library, you often use abstract functions such as pinMode and digitalRead to control inputs and outputs, which are features any microcontroller generally has. However, immediately manipulating a register
+in the next line is poor abstraction (and ugly). Literally, it is reaching inside the registers and forcing the whole module to be hardware dependent. Instead, the register manipulation needs to be in a separate module that can be swapped out when using a different microcontroller.
 
 ## Modules
-The code is split into modules of different abstraction levels, each of which. From most concrete to most abstract:
+The code is split into modules of different abstraction levels. From most concrete (specific) to most abstract (general):
 - Hardware Abstraction Layer (HAL)
 - Driver Layer
 - Service Later
