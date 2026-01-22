@@ -1,13 +1,14 @@
 #include "services/soft_timer.h"
 #include <stdlib.h>
 
+
 #define TIMER_ID TIMER_ID_0
 #define TIMER_CLOCK_SOURCE TIMER_CLOCK_64
 #define TIMER_PRESCALER_VALUE 64
 #define TIMER_TOP 250
-
 const uint16_t ovf_per_sec = ((F_CPU / TIMER_PRESCALER_VALUE) / TIMER_TOP);
 
+static bool initialized = false;
 uint32_t num_millis = 0;
 
 typedef struct {
@@ -43,38 +44,42 @@ static void _soft_timer_internal_callback(void) {
     }
 }
 
-error_t soft_timer_init() {
+error_t soft_timer_service_init() {
     VALIDATE_ERROR(timer_init(TIMER_ID, TIMER_MODE_NORMAL));
     VALIDATE_ERROR(timer_set_callback(TIMER_ID, TIMER_EVENT_OVERFLOW, _soft_timer_internal_callback));
     VALIDATE_ERROR(timer_enable_callback(TIMER_ID, TIMER_EVENT_OVERFLOW, true));
     VALIDATE_ERROR(timer_start(TIMER_ID, TIMER_CLOCK_SOURCE));
+    initialized = true;
     return ERROR_OK;
 }
 
-error_t soft_timer_add_event(uint8_t i, uint16_t period_ms, timer_callback_t cb) {
-    if (i >= MAX_SOFT_TIMERS) {
+error_t soft_timer_set_callback(uint8_t st_id, uint16_t period_ms, timer_callback_t cb) {
+    if (!initialized) {
+        return ERROR_SOFT_TIMER_UNINITIALIZED;
+    } else if (st_id >= MAX_SOFT_TIMERS) {
         return ERROR_SOFT_TIMER_INVALID_ID;
-    }
-    if (_soft_timer_internal_in_use(soft_timers[i])) {
+    } else if (_soft_timer_internal_in_use(soft_timers[st_id])) {
         return ERROR_SOFT_TIMER_CONFLICT;
     }
-    soft_timers[i].counter = 0;
-    soft_timers[i].max_count = period_ms * (ovf_per_sec / 1000);
-    soft_timers[i].callback = cb;
+    soft_timers[st_id].counter = 0;
+    soft_timers[st_id].max_count = period_ms * (ovf_per_sec / 1000);
+    soft_timers[st_id].callback = cb;
     return ERROR_OK;
 }
 
-bool soft_timer_check_overflow(uint8_t i) {
-    if (i >= MAX_SOFT_TIMERS) {
+bool soft_timer_check_overflow(uint8_t st_id) {
+    if (!initialized) {
+        return false;
+    } else if (st_id >= MAX_SOFT_TIMERS) {
         return false;
     }
-    if (soft_timers[i].overflow) {
-        soft_timers[i].overflow = false;
+    if (soft_timers[st_id].overflow) {
+        soft_timers[st_id].overflow = false;
         return true;
     }
     return false;
 }
 
-uint32_t soft_timer_get_millis(void) {
+uint32_t soft_timer_service_get_millis(void) {
     return num_millis;
 }

@@ -8,10 +8,28 @@ void error_led_init(gpio_id_t gpio_id) {
     error_led_id = gpio_id;
 }
 
-void error_blink(uint8_t error_code) {
+
+static void _error_gpio_init() {
     hal_gpio_write_ddr(error_led_id, 1);
     hal_gpio_write_port(error_led_id, 0);
-    uint8_t count = error_code;
+}
+
+
+void error_blink_once(uint8_t num_blinks) {
+    _error_gpio_init();
+    uint8_t count = num_blinks;
+    for (int i = 0; i < count; i++) {
+        hal_gpio_write_port(error_led_id, 1);
+        _delay_ms(160);
+        hal_gpio_write_port(error_led_id, 0);
+        _delay_ms(160);
+    }
+}
+
+
+void error_blink_forever(uint8_t num_blinks) {
+    _error_gpio_init();
+    uint8_t count = num_blinks;
     while (1) {
         for (int i = 0; i < count; i++) {
             hal_gpio_write_port(error_led_id, 1);
@@ -23,5 +41,4 @@ void error_blink(uint8_t error_code) {
             _delay_ms(10);
         }
     }
-    
 }

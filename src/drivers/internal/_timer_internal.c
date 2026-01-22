@@ -2,6 +2,13 @@
 #include "hal_timer0.h"
 #include "hal_timer1.h"
 
+
+
+bool _timer_id_valid(timer_id_t timer_id) {
+    return ((unsigned)timer_id) < NUM_TIMER_IDS;
+}
+
+
 error_t _timer_internal_t0_set_clock(timer_clock_t clock) {
     uint8_t cs_bits = 0;
     switch (clock) {
@@ -36,6 +43,7 @@ error_t _timer_internal_t0_set_clock(timer_clock_t clock) {
     case TIMER_CLOCK_PLL_64MHZ_T1:
     case TIMER_CLOCK_PLL_32MHZ_T1:
     case TIMER_CLOCK_PLL_16MHZ_T1:
+    case NUM_TIMER_CLOCKS:
         return ERROR_TIMER_CLOCK_INVALID;
     }
     hal_timer0_set_clock_select(cs_bits);
@@ -107,7 +115,7 @@ error_t _timer_internal_t1_set_clock(timer_clock_t clock) {
         enable_pll = true;
         cs_bits = 0b0011;
         break;
-    default:
+    case NUM_TIMER_CLOCKS:
         return ERROR_TIMER_CLOCK_INVALID;
     }
     hal_timer1_enable_PLL(enable_pll);

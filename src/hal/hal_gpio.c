@@ -1,5 +1,6 @@
 #include "hal_gpio.h"
 #include <avr/io.h>
+#include <util/atomic.h>
 #include "bitwise.h"
 
 // Extract port and pin from encoded value
@@ -71,12 +72,6 @@ void hal_gpio_write_port(gpio_id_t gpio_id, bool state) {
     uint8_t pin_num = GET_PIN(gpio_id);
     uint8_t port_num = GET_PORT(gpio_id);
     bitwise_write_bit(PORT_REG(port_num), pin_num, state);
-}
-
-void hal_gpio_toggle_port(gpio_id_t gpio_id) {
-    uint8_t pin_num = GET_PIN(gpio_id);
-    uint8_t port_num = GET_PORT(gpio_id);
-    bitwise_write_bit(PIN_REG(port_num), pin_num, 1);
 }
 
 bool hal_gpio_read_pin(gpio_id_t gpio_id) {

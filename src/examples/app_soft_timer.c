@@ -27,10 +27,10 @@ error_t app_init(void) {
     VALIDATE_ERROR(gpio_create(&state.led1, GPIO_ID_B1, GPIO_MODE_OUTPUT));
     VALIDATE_ERROR(gpio_create(&state.led2, GPIO_ID_B2, GPIO_MODE_OUTPUT));
     VALIDATE_ERROR(gpio_create(&state.led3, GPIO_ID_B3, GPIO_MODE_OUTPUT));
-    VALIDATE_ERROR(soft_timer_init());
-    VALIDATE_ERROR(soft_timer_add_event(0, 125, blink0));
-    VALIDATE_ERROR(soft_timer_add_event(1, 250, blink1));
-    VALIDATE_ERROR(soft_timer_add_event(2, 500, empty));
+    VALIDATE_ERROR(soft_timer_service_init());
+    VALIDATE_ERROR(soft_timer_set_callback(0, 125, blink0));
+    VALIDATE_ERROR(soft_timer_set_callback(1, 250, blink1));
+    VALIDATE_ERROR(soft_timer_set_callback(2, 500, empty));
     interrupts_enable();
     return ERROR_OK;
 }
@@ -40,9 +40,9 @@ error_t app_run(void) {
     if (soft_timer_check_overflow(2)) {
         gpio_toggle(&state.led2);
     }
-    if (soft_timer_get_millis() - t > 1000) {
+    if (soft_timer_service_get_millis() - t > 1000) {
         gpio_toggle(&state.led3);
-        t = soft_timer_get_millis();
+        t = soft_timer_service_get_millis();
     }
     return ERROR_OK;
 }

@@ -26,7 +26,6 @@ static bool _ovf_valid(timer_mode_t mode) {
     }
 }
 
-
 // TIMER0 INTERNALS
 
 static error_t _timer0_set_mode(timer_mode_t mode) {
@@ -139,13 +138,14 @@ timer_state_t timer_states[2] = {
     }),
 };
 
+static bool _timer_initialized(timer_state_t timer_state) {
+    return timer_state.initialized;
+}
+
 
 // SHARED TIMER PUBLIC API
 
 error_t timer_init(timer_id_t id, timer_mode_t mode) {
-    if (id > TIMER_ID_COUNT) {
-        return ERROR_TIMER_ID_UNSUPPORTED;
-    }
     error_t err = ERROR_OK;
     switch (id) {
     case TIMER_ID_0:
@@ -157,6 +157,7 @@ error_t timer_init(timer_id_t id, timer_mode_t mode) {
     default:
         return ERROR_TIMER_ID_UNSUPPORTED;
     }
+    
     if (err == ERROR_OK) {
         timer_states[id].initialized = true;
         timer_states[id].mode = mode;
@@ -165,15 +166,16 @@ error_t timer_init(timer_id_t id, timer_mode_t mode) {
 }
 
 error_t timer_set_top(timer_id_t id, uint8_t top) {
-    if (id > TIMER_ID_COUNT) {
+    if (_timer_id_valid(id)) {
         return ERROR_TIMER_ID_UNSUPPORTED;
-    } else if (!timer_states[id].initialized) {
+    }
+    if (!_timer_initialized(timer_states[id])) {
         return ERROR_TIMER_UNINITIALIZED;
     }
-    timer_mode_t mode = timer_states[id].mode;
-    if (!_top_valid(mode)) {
+    if (!_top_valid(timer_states[id].mode)) {
         return ERROR_TIMER_TOP_NOT_ALLOWED;
     }
+
     switch(id) {
     case TIMER_ID_0:
         _timer0_set_top(id);
@@ -187,11 +189,13 @@ error_t timer_set_top(timer_id_t id, uint8_t top) {
 }
 
 error_t timer_set_count(timer_id_t id, uint8_t count) {
-     if (id > TIMER_ID_COUNT) {
+    if (_timer_id_valid(id)) {
         return ERROR_TIMER_ID_UNSUPPORTED;
-    } else if (!timer_states[id].initialized) {
+    }
+    if (!_timer_initialized(timer_states[id])) {
         return ERROR_TIMER_UNINITIALIZED;
     }
+
     switch (id) {
     case TIMER_ID_0:
         hal_timer0_set_count(count);
@@ -206,11 +210,13 @@ error_t timer_set_count(timer_id_t id, uint8_t count) {
 }
 
 error_t timer_set_callback(timer_id_t id, timer_event_t event, timer_callback_t cb) {
-    if (id > TIMER_ID_COUNT) {
+    if (_timer_id_valid(id)) {
         return ERROR_TIMER_ID_UNSUPPORTED;
-    } else if (!timer_states[id].initialized) {
+    }
+    if (!_timer_initialized(timer_states[id])) {
         return ERROR_TIMER_UNINITIALIZED;
     }
+
     switch (event) {
     case TIMER_EVENT_COMPARE_A:
         timer_states[id].compareA_cb = cb;
@@ -222,7 +228,6 @@ error_t timer_set_callback(timer_id_t id, timer_event_t event, timer_callback_t 
         }
         timer_states[id].overflow_cb = cb;
         break;
-        
     default:
         return ERROR_TIMER_EVENT_UNSUPPORTED;
     }
@@ -230,29 +235,32 @@ error_t timer_set_callback(timer_id_t id, timer_event_t event, timer_callback_t 
 }
 
 error_t timer_enable_callback(timer_id_t id, timer_event_t event, bool enable) {
-    if (id > TIMER_ID_COUNT) {
+    if (_timer_id_valid(id)) {
         return ERROR_TIMER_ID_UNSUPPORTED;
-    } else if (!timer_states[id].initialized) {
+    }
+    if (!_timer_initialized(timer_states[id])) {
         return ERROR_TIMER_UNINITIALIZED;
     }
+
     switch (id) {
-        case TIMER_ID_0:
-            return _timer0_enable_callback(event, timer_states[id].mode, enable);
-        case TIMER_ID_1:
-            return _timer1_enable_callback(event, timer_states[id].mode, enable);
-        default:
-            return ERROR_TIMER_ID_UNSUPPORTED;
+    case TIMER_ID_0:
+        return _timer0_enable_callback(event, timer_states[id].mode, enable);
+    case TIMER_ID_1:
+        return _timer1_enable_callback(event, timer_states[id].mode, enable);
+    default:
+        return ERROR_TIMER_ID_UNSUPPORTED;
     }
 }
 
 error_t timer_start(timer_id_t id, timer_clock_t clock) {
-    if (id > TIMER_ID_COUNT) {
+    if (_timer_id_valid(id)) {
         return ERROR_TIMER_ID_UNSUPPORTED;
-    } else if (!timer_states[id].initialized) {
+    }
+    if (!_timer_initialized(timer_states[id])) {
         return ERROR_TIMER_UNINITIALIZED;
     }
+
     error_t err = ERROR_OK;
-    
     switch (id) {
     case TIMER_ID_0:
         err = _timer_internal_t0_set_clock(clock);
@@ -268,7 +276,6 @@ error_t timer_start(timer_id_t id, timer_clock_t clock) {
     }
     return err;
 }
-
 
 error_t timer_stop(timer_id_t id) {
     return timer_start(id, TIMER_CLOCK_OFF);

@@ -1,16 +1,20 @@
 #ifndef PWM_H
 #define PWM_H
-#include "drivers/timer_clock.h"
+#include "drivers/timer_common.h"
 #include "drivers/error.h"
 
 typedef enum {
     PWM_MODE_FAST_FIXED_TOP_T0, // T0 EXCLUSIVE
     PWM_MODE_FAST_VARIABLE_TOP,
+
+    NUM_PWM_MODES, // Number of PWM modes
 } pwm_mode_t;
 
 typedef enum {
     PWM_CHANNEL_A,
     PWM_CHANNEL_B,
+
+    NUM_PWM_CHANNELS
 } pwm_channel_t;
 
 error_t pwm_init(timer_id_t id, pwm_mode_t mode);

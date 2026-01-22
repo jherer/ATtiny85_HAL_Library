@@ -147,10 +147,33 @@ typedef struct {
     pwm_mode_t mode;
     bool compare_A_enabled;
     bool compare_B_enabled;
+    uint8_t compare_value;
     uint8_t top;
 } pwm_state_t;
 
 pwm_state_t pwm_states[2] = {0};
+
+static bool _pwm_initialized(pwm_state_t pwm_state) {
+    return pwm_state.initialized;
+}
+
+static bool _pwm_values_valid(pwm_mode_t mode, uint8_t top_value, uint8_t compare_value) {
+    bool invalid = (mode == PWM_MODE_FAST_VARIABLE_TOP &&
+                    compare_value > top_value);
+    return !invalid;
+}
+
+static bool _pwm_set_duty_valid(pwm_mode_t mode, timer_id_t id, pwm_channel_t channel) {
+    bool invalid = (id == TIMER_ID_0 &&
+                    mode == PWM_MODE_FAST_VARIABLE_TOP &&
+                    channel == PWM_CHANNEL_A);
+    return !invalid;
+}
+
+static bool _pwm_set_top_valid(pwm_mode_t mode) {
+    bool invalid = (mode == PWM_MODE_FAST_FIXED_TOP_T0);
+    return !invalid;
+}
 
 
 error_t _set_compare_enabled(timer_id_t id, pwm_channel_t channel, bool enabled) {
@@ -166,10 +189,11 @@ error_t _set_compare_enabled(timer_id_t id, pwm_channel_t channel, bool enabled)
     }
 }
 
+
 // SHARED PWM PUBLIC API
 
 error_t pwm_init(timer_id_t id, pwm_mode_t mode) {
-    if (id > TIMER_ID_COUNT) {
+    if (_timer_id_valid(id)) {
         return ERROR_TIMER_ID_UNSUPPORTED;
     }
     error_t err = ERROR_OK;
@@ -191,10 +215,10 @@ error_t pwm_init(timer_id_t id, pwm_mode_t mode) {
 }
 
 error_t pwm_start(timer_id_t id, timer_clock_t clock) {
-    if (id > TIMER_ID_COUNT) {
+    if (_timer_id_valid(id)) {
         return ERROR_TIMER_ID_UNSUPPORTED;
     }
-    if (!pwm_states[id].initialized) {
+    if (!_pwm_initialized(pwm_states[id])) {
         return ERROR_PWM_UNINITIALIZED;
     }
     switch(id) {
@@ -208,12 +232,13 @@ error_t pwm_start(timer_id_t id, timer_clock_t clock) {
 }
 
 error_t pwm_attach(timer_id_t id, pwm_channel_t channel) {
-    if (id > TIMER_ID_COUNT) {
+    if (_timer_id_valid(id)) {
         return ERROR_TIMER_ID_UNSUPPORTED;
     }
-    if (!pwm_states[id].initialized) {
+    if (!_pwm_initialized(pwm_states[id])) {
         return ERROR_PWM_UNINITIALIZED;
     }
+
     error_t err = ERROR_OK;
     switch (id) {
     case TIMER_ID_0:
@@ -236,12 +261,13 @@ error_t pwm_attach(timer_id_t id, pwm_channel_t channel) {
 }
 
 error_t pwm_detach(timer_id_t id, pwm_channel_t channel) {
-    if (id > TIMER_ID_COUNT) {
+    if (_timer_id_valid(id)) {
         return ERROR_TIMER_ID_UNSUPPORTED;
     }
-    if (!pwm_states[id].initialized) {
+    if (!_pwm_initialized(pwm_states[id])) {
         return ERROR_PWM_UNINITIALIZED;
     }
+
     error_t err = ERROR_OK;
     switch (id) {
     case TIMER_ID_0:
@@ -259,24 +285,28 @@ error_t pwm_detach(timer_id_t id, pwm_channel_t channel) {
     return err;
 }
 
-error_t pwm_set_duty(timer_id_t id, pwm_channel_t channel, uint8_t value) {
-    if (id > TIMER_ID_COUNT) {
+error_t pwm_set_duty(timer_id_t id, pwm_channel_t channel, uint8_t compare_value) {
+    if (_timer_id_valid(id)) {
         return ERROR_TIMER_ID_UNSUPPORTED;
     }
-    if (pwm_states[id].mode == PWM_MODE_FAST_VARIABLE_TOP &&
-        value > pwm_states[id].top) {
+    if (!_pwm_initialized(pwm_states[id])) {
+        return ERROR_PWM_UNINITIALIZED;
+    }
+    if (!_pwm_values_valid(pwm_states[id].mode, pwm_states[id].top, compare_value)) {
         return ERROR_PWM_COMPARE_ABOVE_TOP;
+    }
+    if (!_pwm_set_duty_valid(pwm_states[id].mode, id, channel)) {
+        return ERROR_PWM_CHANNEL_A_IS_TOP;
     }
     
     switch (id) {
     case TIMER_ID_0:
-        if (pwm_states[id].mode == PWM_MODE_FAST_VARIABLE_TOP &&
-            channel == PWM_CHANNEL_A) {
-            return ERROR_PWM_CHANNEL_A_IS_TOP;
-        }
-        return _pwm_timer0_set_duty(channel, value);
+        pwm_states[id].compare_value = compare_value;
+        return _pwm_timer0_set_duty(channel, compare_value);
+        
     case TIMER_ID_1:
-        return _pwm_timer1_set_duty(channel, value);
+        pwm_states[id].compare_value = compare_value;
+        return _pwm_timer1_set_duty(channel, compare_value);
     default:
         return ERROR_TIMER_ID_UNSUPPORTED;
     }
@@ -284,21 +314,17 @@ error_t pwm_set_duty(timer_id_t id, pwm_channel_t channel, uint8_t value) {
 
 
 error_t pwm_set_top(timer_id_t id, uint8_t top) {
-    if (id > TIMER_ID_COUNT) {
+    if (_timer_id_valid(id)) {
         return ERROR_TIMER_ID_UNSUPPORTED;
     }
-    if (!pwm_states[id].initialized) {
+    if (!_pwm_initialized(pwm_states[id])) {
         return ERROR_PWM_UNINITIALIZED;
     }
-
-    pwm_mode_t mode = pwm_states[id].mode;
-    switch(mode) {
-    case PWM_MODE_FAST_FIXED_TOP_T0:
+    if (!_pwm_values_valid(pwm_states[id].mode, top, pwm_states[id].compare_value)) {
+        return ERROR_PWM_COMPARE_ABOVE_TOP;
+    }
+    if (!_pwm_set_top_valid(pwm_states[id].mode)) {
         return ERROR_PWM_MODE_TOP_INVALID;
-    case PWM_MODE_FAST_VARIABLE_TOP:
-        break;
-    default:
-        return ERROR_PWM_MODE_UNSUPPORTED;
     }
 
     switch (id) {

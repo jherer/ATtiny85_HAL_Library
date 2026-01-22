@@ -21,6 +21,8 @@ typedef enum {
     GPIO_MODE_INPUT,
     GPIO_MODE_INPUT_PULLUP,
     GPIO_MODE_OUTPUT,
+
+    NUM_GPIO_MODES, // Number of GPIO modes
 } gpio_mode_t;
 
 // Struct that holds the location of a certain pin

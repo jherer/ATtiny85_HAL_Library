@@ -15,7 +15,7 @@
 #ifndef TIMER_H
 #define TIMER_H
 #include <stdbool.h>
-#include "drivers/timer_clock.h"
+#include "drivers/timer_common.h"
 #include "drivers/error.h"
 
 typedef void (*timer_callback_t)(void);
@@ -23,11 +23,15 @@ typedef void (*timer_callback_t)(void);
 typedef enum {
     TIMER_EVENT_COMPARE_A,
     TIMER_EVENT_OVERFLOW,
+
+    NUM_TIMER_EVENTS, // Number of timer events
 } timer_event_t;
 
 typedef enum {
     TIMER_MODE_NORMAL,
     TIMER_MODE_CTC,
+
+    NUM_TIMER_MODES, //Number of timer modes
 } timer_mode_t;
 
 error_t timer_init(timer_id_t id, timer_mode_t mode);

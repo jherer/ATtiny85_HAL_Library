@@ -60,9 +60,9 @@ LDFLAGS	= -mmcu=$(MCU) # linker flags
 # ------------------------------
 # Build rules
 # ------------------------------
-.PHONY: all flash clean # Tell the makefile these are command names, not files
+.PHONY: build flash clean # Tell the makefile these are command names, not files
 
-all: $(TARGET).hex
+build: $(TARGET).hex
 
 $(TARGET).elf: $(OBJ)
 	$(CC) $(LDFLAGS) $^ -o $@
@@ -102,6 +102,6 @@ $(BUILD_DIR)/hal/%.o: src/hal/%.c
 
 flash:$(TARGET).hex
 	avrdude -p $(MCU) -P $(PORT) -b $(BAUD) -c $(ISP) -U flash:w:'$<':a
-
+	
 clean:
 	rmdir /S /Q build

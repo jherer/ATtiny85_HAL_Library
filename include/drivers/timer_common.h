@@ -16,7 +16,8 @@
 typedef enum {
     TIMER_ID_0,
     TIMER_ID_1,
-    TIMER_ID_COUNT
+
+    NUM_TIMER_IDS
 } timer_id_t;
 
 typedef enum {
@@ -40,6 +41,8 @@ typedef enum {
     TIMER_CLOCK_PLL_64MHZ_T1,
     TIMER_CLOCK_PLL_32MHZ_T1,
     TIMER_CLOCK_PLL_16MHZ_T1,
+
+    NUM_TIMER_CLOCKS, // Number of timer clocks
 } timer_clock_t;
 
 #endif
