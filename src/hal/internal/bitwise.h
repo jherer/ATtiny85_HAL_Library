@@ -10,8 +10,7 @@
  * @version 1.0
  */
 
- #ifndef BITWISE_H
-#define BITWISE_H
+#pragma once
 #include <stdint.h>
 #include <stdbool.h>
 
@@ -26,4 +25,7 @@ static inline void bitwise_write_bit(volatile uint8_t *reg, uint8_t bit_num, boo
         *reg &= ~(1 << bit_num);
     }
 }
-#endif
+
+inline void bitwise_write_mask(volatile uint8_t *reg, uint8_t mask, uint8_t new_bits) {
+    *reg = (*reg & ~mask) | new_bits;
+}

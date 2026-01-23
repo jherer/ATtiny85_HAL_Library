@@ -1,37 +1,30 @@
-#ifndef TIMER_H
-#define TIMER_H
+#pragma once
+
+#include "drivers/timer0.h"
 #include <stdint.h>
-
-typedef enum {
-    TIMER0_MODE_NORMAL,
-    TIMER0_MODE_CTC,
-    TIMER0_MODE_PWM_FIXED_A,
-    TIMER0_MODE_PWM_FIXED_B,
-    TIMER0_MODE_PWM_FIXED_AB,
-    TIMER0_MODE_PWM_VARIABLE_A,
-    TIMER0_MODE_PWM_VARIABLE_B,
-    TIMER0_MODE_PWM_VARIABLE_AB,
-} timer0_mode_t;
-
-typedef enum {
-    TIMER0_CLOCK_OFF,
-    TIMER0_CLOCK_1,
-    TIMER0_CLOCK_8,
-    TIMER0_CLOCK_64,
-    TIMER0_CLOCK_256,
-    TIMER0_CLOCK_1024,
-
-    NUM_TIMER0_CLOCKS,
-} timer0_clock_t;
+#include <stdbool.h>
+#include "hal/timer0_enums.h"
+#include "drivers/error_code.h"
 
 
-typedef enum {
-    TIMER0_PWM_CHANNEL_NONE,
-    TIMER0_PWM_CHANNEL_A,
-    TIMER0_PWM_CHANNEL_B,
-    
-    NUM_TIMER0_PWM_CHANNELS,
-} timer0_pwm_channels
+// PUBLIC API
+
+#define ERROR_TIMER0_UNINITIALIZED      (ERROR_MODULE_TIMER0 | 0x02)
+#define ERROR_TIMER0_ENUM_UNSUPPORTED   (ERROR_MODULE_TIMER0 | 0x03)
+#define ERROR_TIMER0_TOP_BAD_MODE       (ERROR_MODULE_TIMER0 | 0x04)
+#define ERROR_TIMER0_PWM_BAD_MODE       (ERROR_MODULE_TIMER0 | 0x05)
+#define ERROR_TIMER0_PWM_CHANNEL_BAD_MODE   (ERROR_MODULE_TIMER0 | 0x06)
+#define ERROR_TIMER0_PWM_PIN_CONFLICT   (ERROR_MODULE_TIMER0 | 0x07)
+#define ERROR_TIMER0_EVENT_BAD_MODE     (ERROR_MODULE_TIMER0 | 0x08)
 
 
-#endif
+error_code_t timer0_init(timer0_mode_t mode);
+error_code_t timer0_set_top(uint8_t top);
+error_code_t timer0_pwm_attach(timer0_pwm_channel_t pwm_channel);
+error_code_t timer0_pwm_detach(timer0_pwm_channel_t pwm_channel);
+error_code_t timer0_pwm_set_duty(timer0_pwm_channel_t pwm_channel, uint8_t value);
+error_code_t timer0_set_callback(timer0_event_t event, timer_callback_t callback);
+error_code_t timer0_enable_callback(timer0_event_t event, bool enable);
+error_code_t timer0_start_clock(timer0_clock_t clock);
+error_code_t timer0_set_mode(timer0_mode_t mode);
+error_code_t cleanup();

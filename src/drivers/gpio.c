@@ -1,19 +1,21 @@
 #include "drivers/gpio.h"
 #include "hal_gpio.h"
 #include <stdlib.h>
+#include "sim/debug.h"
 
-error_t gpio_create(gpio_t *gpio, gpio_id_t gpio_id, gpio_mode_t mode) {
+error_code_t gpio_create(gpio_t *gpio, GPIO_t gpio_id, gpio_mode_t mode) {
     *gpio = ((gpio_t) {
         .gpio_id = gpio_id,
         .mode = GPIO_MODE_UNINITIALIZED,
         .state = false,
     });
+    debug_print_hex("GPIO created at", gpio_id);
 
     return gpio_set_mode(gpio, mode);
 }
 
 // Set the mode (data direction) of a pin
-error_t gpio_set_mode(gpio_t *gpio, gpio_mode_t mode) {
+error_code_t gpio_set_mode(gpio_t *gpio, gpio_mode_t mode) {
     if (gpio == NULL) {
         return ERROR_GPIO_NULL_POINTER;
     }
@@ -36,6 +38,7 @@ error_t gpio_set_mode(gpio_t *gpio, gpio_mode_t mode) {
         return ERROR_GPIO_MODE_UNSUPPORTED;
     }
     gpio->mode = mode;
+    debug_print_hex("GPIO mode set to", mode);
     return ERROR_OK;
 }
 
@@ -46,7 +49,7 @@ bool gpio_read(gpio_t *gpio) {
 }
 
 // Set an output pin (high)
-error_t gpio_write(gpio_t *gpio, bool state) {
+error_code_t gpio_write(gpio_t *gpio, bool state) {
     if (gpio == NULL) {
         return ERROR_GPIO_NULL_POINTER;
     }
@@ -70,7 +73,7 @@ error_t gpio_write(gpio_t *gpio, bool state) {
 // If the pin is input this will toggle the pullup resistor
 // Checking the state manually can be better than using XOR for toggling
 // Because XOR is not a fully atomic operation
-error_t gpio_toggle(gpio_t *gpio) {
+error_code_t gpio_toggle(gpio_t *gpio) {
     if (gpio == NULL) {
         return ERROR_GPIO_NULL_POINTER;
     }

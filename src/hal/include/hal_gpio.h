@@ -9,20 +9,18 @@
  * @version 1.0
  */
 
-#ifndef HAL_GPIO_H
-#define HAL_GPIO_H
+#pragma once
 #include <stdbool.h>
 #include "hal/gpio_ids.h"
 
 /* Write to a certain bit on the data direction register */
-void hal_gpio_write_ddr(gpio_id_t gpio_id, bool state);
+void hal_gpio_write_ddr(GPIO_t gpio_id, bool state);
 
 /* Write to a certain bit on the port register (control the state of an output pin or the pullup of an input pin) */
-void hal_gpio_write_port(gpio_id_t gpio_id, bool state);
+void hal_gpio_write_port(GPIO_t gpio_id, bool state);
 
 /* Toggle a certain bit on the port register (toggle the state of an output pin) */
-void hal_gpio_toggle_port(gpio_id_t gpio_id);
+void hal_gpio_toggle_port(GPIO_t gpio_id);
 
 /* Read a certain bit from the pin register (read an input pin) */
-bool hal_gpio_read_pin(gpio_id_t gpio_id);
-#endif
+bool hal_gpio_read_pin(GPIO_t gpio_id);

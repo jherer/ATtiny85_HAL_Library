@@ -10,10 +10,20 @@
  * @version 1.0
  */
 
-#ifndef APP_H
-#define APP_H
-#include "drivers/error.h"
+#pragma once
+#include "drivers/error_code.h"
 #include "drivers/interrupts.h"
-error_t app_init(void);
-error_t app_run(void);
-#endif
+
+// Wrap any functions in app_init() or app_run() that return error_code_t
+// To return the error to the main
+#define ASSERT_OK(x) \
+    do { \
+        error_code_t err = x; \
+        if (err != ERROR_OK) { \
+            return err; \
+        } \
+    } while (0) \
+
+
+error_code_t app_init(void);
+error_code_t app_run(void);

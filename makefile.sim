@@ -1,0 +1,108 @@
+# ----------------------------
+#	TOOLCHAIN
+# ----------------------------
+CC = gcc
+
+# ----------------------------
+#	Files
+# ----------------------------
+APP_SRC		= src/examples/app_timer0_ctc.c # CHANGE APP SOURCE HERE
+
+MAIN_SRC		= src/sim_main.c
+SERVICES_SRC	= $(wildcard src/services/*.c)
+DRIVERS_SRC 	= $(wildcard src/drivers/*.c) $(wildcard src/drivers/internal/*.c)
+HAL_SRC			= $(wildcard src/hal/*.c) $(wildcard src/hal/internal/*.c)
+SIM_SRC			= $(wildcard src/sim/*.c)
+
+APP_INCLUDE		= include
+MAIN_INCLUDE	= include
+SERVICES_INCLUDE= include
+DRIVERS_INCLUDE	= include src/hal/include src/drivers/internal
+HAL_INCLUDE		= include src/hal/include src/hal/internal
+SIM_INCLUDE		= include
+
+BUILD_DIR 	= build/sim
+TARGET 		= $(BUILD_DIR)/sim.exe
+
+
+SRC	= $(SIM_SRC) $(HAL_SRC) $(DRIVERS_SRC) $(SERVICES_SRC) $(MAIN_SRC) $(APP_SRC)
+OBJ	= $(SRC:src/%.c=$(BUILD_DIR)/%.o)
+
+
+# ----------------------------
+#	Compiler Flags
+# ----------------------------
+CFLAGS  = -D HAL_SIM -g 
+CFLAGS	+= -Wall -Wno-unused-function -Wno-unused-variable
+CFLAGS	+= -Os -std=gnu11
+
+APP_CFLAGS		= $(CFLAGS) $(APP_INCLUDE:%=-I%)
+MAIN_CFLAGS		= $(CFLAGS) $(MAIN_INCLUDE:%=-I%)
+SERVICES_CFLAGS = $(CFLAGS) $(SERVICES_INCLUDE:%=-I%)
+DRIVERS_CFLAGS	= $(CFLAGS) $(DRIVERS_INCLUDE:%=-I%)
+HAL_CFLAGS		= $(CFLAGS) $(HAL_INCLUDE:%=-I%)
+SIM_CFLAGS		= $(CFLAGS) $(SIM_INCLUDE:%=-I%) -Wno-deprecated-declarations
+
+LDFLAGS	= # linker flags
+
+ifeq ($(OS),Windows_NT)
+	REMOVE = powershell.exe -Command "Remove-Item -Recurse -Force" -Path
+else
+    REMOVE = rm -rf
+endif
+
+# ------------------------------
+# Build rules
+# ------------------------------
+.PHONY: build run clean # Tell the makefile these are command names, not files
+
+run: build
+	$(TARGET)
+
+build: $(TARGET)
+
+$(TARGET): $(OBJ)
+	$(CC) $(LDFLAGS) $^ -o $@
+
+# Build app
+$(BUILD_DIR)/app/%.o: src/app/%.c include/app/app.h
+	@if not exist "$(dir $@)" mkdir "$(dir $@)"
+	$(CC) $(APP_CFLAGS) -c $< -o $@
+
+# Build main
+$(BUILD_DIR)/%.o: src/%.c
+	@if not exist "$(dir $@)" mkdir "$(dir $@)"
+	$(CC) $(MAIN_CFLAGS) -c $< -o $@
+
+# Build sim
+$(BUILD_DIR)/sim/%.o: src/sim/%.c include/sim/%.h
+	@if not exist "$(dir $@)" mkdir "$(dir $@)"
+	$(CC) $(SIM_CFLAGS) -c $< -o $@
+	
+# Build services
+$(BUILD_DIR)/services/%.o: src/services/%.c include/services/%.h
+	@if not exist "$(dir $@)" mkdir "$(dir $@)"
+	$(CC) $(SERVICES_CFLAGS) -c $< -o $@
+	
+# Build driver internal
+$(BUILD_DIR)/drivers/internal/%.o: src/drivers/internal/%.c src/drivers/internal/%.h
+	@if not exist "$(dir $@)" mkdir "$(dir $@)"
+	$(CC) $(DRIVERS_CFLAGS) -c $< -o $@
+	
+# Build drivers
+$(BUILD_DIR)/drivers/%.o: src/drivers/%.c include/drivers/%.h
+	@if not exist "$(dir $@)" mkdir "$(dir $@)"
+	$(CC) $(DRIVERS_CFLAGS) -c $< -o $@
+	
+# Build HAL
+$(BUILD_DIR)/hal/%.o: src/hal/%.c src/hal/include/%.h
+	@if not exist "$(dir $@)" mkdir "$(dir $@)"
+	$(CC) $(HAL_CFLAGS) -c $< -o $@
+
+# Build HAL internal
+$(BUILD_DIR)/hal/internal/%.o: src/hal/internal/%.c src/hal/internal/%.h
+	@if not exist "$(dir $@)" mkdir "$(dir $@)"
+	$(CC) $(HAL_CFLAGS) -c $< -o $@
+
+clean:
+	$(REMOVE) $(BUILD_DIR)/*
