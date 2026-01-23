@@ -3,23 +3,12 @@
 #include "bitwise.h"
 
 
-// WAVE GENERATION MODE
+// CONFIG
 
-void hal_timer0_set_wave_gen_mode(uint8_t wgm_bits) {
-    bitwise_write_bit(&TCCR0A, WGM00, wgm_bits & (1 << 0));
-    bitwise_write_bit(&TCCR0A, WGM01, wgm_bits & (1 << 1));
-    bitwise_write_bit(&TCCR0B, WGM02, wgm_bits & (1 << 2));
+void hal_timer0_config(uint8_t tccr0a_bits, uint8_t tccr0b_bits) {
+    TCCR0A = tccr0a_bits;
+    TCCR0B = tccr0b_bits;
 }
-
-
-// CLOCK SELECT
-
-void hal_timer0_set_clock_select(uint8_t cs_bits) {
-    bitwise_write_bit(&TCCR0B, CS00, cs_bits & (1 << 0));
-    bitwise_write_bit(&TCCR0B, CS01, cs_bits & (1 << 1));
-    bitwise_write_bit(&TCCR0B, CS02, cs_bits & (1 << 2));
-}
-
 
 // COUNTER 
 
@@ -40,19 +29,6 @@ void hal_timer0_set_output_compare_register_A(uint8_t ocr0a_value) {
 
 void hal_timer0_set_output_compare_register_B(uint8_t ocr0b_value) {
     OCR0B = ocr0b_value;
-}
-
-
-// COMPARE MODE
-
-void hal_timer0_set_compare_output_mode_A(uint8_t com0a_bits) {
-    bitwise_write_bit(&TCCR0A, COM0A0, com0a_bits & (1 << 0));
-    bitwise_write_bit(&TCCR0A, COM0A1, com0a_bits & (1 << 1));
-}
-
-void hal_timer0_set_compare_output_mode_B(uint8_t com0b_bits) {
-    bitwise_write_bit(&TCCR0A, COM0B0, com0b_bits & (1 << 0));
-    bitwise_write_bit(&TCCR0A, COM0B1, com0b_bits & (1 << 1));
 }
 
 

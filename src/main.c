@@ -14,7 +14,7 @@ uint8_t get_error_code(error_t err) {
     case ERROR_GPIO_WRITE_INPUT:        return 3;
     case ERROR_GPIO_UNINITIALIZED:      return 4;
     case ERROR_GPIO_NULL_POINTER:       return 5;
-
+/*
     case ERROR_TIMER_UNINITIALIZED:     return 6;
     case ERROR_TIMER_MODE_UNSUPPORTED:  return 7;
     case ERROR_TIMER_TOP_NOT_ALLOWED:   return 8;
@@ -34,7 +34,7 @@ uint8_t get_error_code(error_t err) {
     case ERROR_PWM_CHANNEL_UNSUPPORTED: return 23;
     case ERROR_PWM_CHANNEL_CONFLICT:    return 24;
     case ERROR_PWM_CHANNEL_A_IS_TOP:    return 25;
-/*
+
     case ERROR_ADC_UNINITIALIZED:       return 24;
     case ERROR_ADC_CHANNEL_UNSUPPORTED: return 25;
 

@@ -1,6 +1,6 @@
 #include "drivers/gpio.h"
-#include <stdlib.h>
 #include "hal_gpio.h"
+#include <stdlib.h>
 
 error_t gpio_create(gpio_t *gpio, gpio_id_t gpio_id, gpio_mode_t mode) {
     *gpio = ((gpio_t) {
