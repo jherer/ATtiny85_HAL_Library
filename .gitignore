@@ -1,3 +1,4 @@
-build/*
+build/sim/*
+build/mcu/*
 .vscode/tasks.json
 .vscode/c_cpp_properties.json

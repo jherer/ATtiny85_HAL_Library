@@ -11,10 +11,7 @@
  * @date January 17, 2026
  * @version 1.0
  */
-#ifndef INTERRUPTS_H
-#define INTERRUPTS_H
+#pragma once
 
 void interrupts_enable(void);
 void interrupts_disable(void);
-
-#endif

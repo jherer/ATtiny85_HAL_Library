@@ -9,8 +9,7 @@
  * @version 1.0
  */
 
-#ifndef HAL_GPIO_H
-#define HAL_GPIO_H
+#pragma once
 #include <stdbool.h>
 #include "hal/gpio_ids.h"
 
@@ -25,4 +24,3 @@ void hal_gpio_toggle_port(gpio_id_t gpio_id);
 
 /* Read a certain bit from the pin register (read an input pin) */
 bool hal_gpio_read_pin(gpio_id_t gpio_id);
-#endif

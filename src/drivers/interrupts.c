@@ -1,10 +1,9 @@
-#include <avr/interrupt.h>
-#include <stdbool.h>
+#include "hal_status.h"
 
 void interrupts_enable(void) {
-    sei();
+    hal_status_interrupts_enable();
 }
 
 void interrupts_disable(void) {
-    cli();
+    hal_status_interrupts_disable();
 }

@@ -1,76 +1,27 @@
-//#define F_CPU 16000000UL
 #include "app/app.h"
-#include "drivers/error.h"
+#include "drivers/error_code.h"
 #include "drivers/gpio.h"
+#include "sim/debug.h"
 
 #define DO_ERROR_BLINK
 
-uint8_t get_error_code(error_t err) {
-    switch (err) {
-    case ERROR_OK:                      return 0;
-    case ERROR_USER_DEFINED:            return 5;
-
-    case ERROR_GPIO_UNINITIALIZED:      return 1;
-    case ERROR_GPIO_WRITE_INPUT:        return 2;
-    case ERROR_GPIO_NULL_POINTER:       return 3;
-
-    case ERROR_TIMER_UNINITIALIZED:     return 4;
-    case ERROR_TIMER_TOP_NOT_ALLOWED:   return 6;
-    case ERROR_TIMER_OVF_NOT_ALLOWED:   return 7;
-    case ERROR_TIMER_CLOCK_INVALID:     return 8;
-    
-    case ERROR_SOFT_TIMER_UNINITIALIZED:return 9;
-    case ERROR_SOFT_TIMER_CONFLICT:     return 10;
-    case ERROR_SOFT_TIMER_INVALID_ID:   return 11;
-
-    case ERROR_BUTTON_UNINITIALIZED:    return 12;
-    case ERROR_BUTTON_CONFLICT:         return 13;
-    case ERROR_BUTTON_INVALID_ID:       return 14;
-
-    case ERROR_PWM_UNINITIALIZED:       return 15;
-    case ERROR_PWM_MODE_INVALID_FOR_T1: return 16;
-    case ERROR_PWM_MODE_TOP_INVALID:    return 17;
-    case ERROR_PWM_COMPARE_ABOVE_TOP:   return 18;
-    case ERROR_PWM_CHANNEL_CONFLICT:    return 19;
-    case ERROR_PWM_CHANNEL_A_IS_TOP:    return 20;
-    
-    case ERROR_ADC_UNINITIALIZED:       return 21;
-    case ERROR_ADC_CHANNEL_UNSUPPORTED: return 22;
-
-    case ERROR_SPI_UNINITIALIZED:       return 23;
-    case ERROR_SPI_CLOCK_UNSUPPORTED:   return 24;
-    case ERROR_SPI_CLOCK_WRONG_ROLE:    return 25;
-
-    case ERROR_FUNCTION_UNSUPPORTED://    return 1;
-    case ERROR_GPIO_MODE_UNSUPPORTED://   return 2;
-    case ERROR_TIMER_ID_UNSUPPORTED://    return 12;
-    case ERROR_TIMER_MODE_UNSUPPORTED://  return 7;
-    case ERROR_TIMER_EVENT_UNSUPPORTED:// return 11;
-    case ERROR_PWM_MODE_UNSUPPORTED://    return 20;
-    case ERROR_PWM_CHANNEL_UNSUPPORTED:// return 18;
-
-    default: return 255;
-    }
-}
-
 int main() {
-    error_t init_err = app_init();
+    error_code_t init_err = app_init();
 
-#ifdef DO_ERROR_BLINK
-    if (init_err != ERROR_OK) {
-        error_blink_forever(get_error_code(init_err));
-    }
-#endif
+    #ifdef DO_ERROR_BLINK
+        if (init_err != ERROR_OK) {
+            error_code_blink_forever(init_err);
+        }
+    #endif
 
     while (1) {
-        error_t run_err = app_run();
-
-#ifdef DO_ERROR_BLINK
-        if (run_err != ERROR_OK) {
-            error_blink_forever(get_error_code(run_err));
-        }
-#endif
-
+        error_code_t run_err = app_run();
+        
+        #ifdef DO_ERROR_BLINK
+            if (run_err != ERROR_OK) {
+                error_code_blink_forever(run_err);
+            }
+        #endif
     }
     return 0;
 }
