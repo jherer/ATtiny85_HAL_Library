@@ -16,12 +16,42 @@
 #define ERROR_TIMER0_PWM_PIN_CONFLICT   (ERROR_MODULE_TIMER0 | 0x07)
 #define ERROR_TIMER0_EVENT_BAD_MODE     (ERROR_MODULE_TIMER0 | 0x08)
 
+
+static inline bool timer0_is_mode_valid(timer0_mode_t mode) {
+    return (unsigned)mode < TIMER0_NUM_MODES;
+}
+
+static inline bool timer0_is_clock_valid(timer0_clock_t clock) {
+    return (unsigned)clock < TIMER0_NUM_CLOCKS;
+}
+
+
 typedef enum {
     TIMER0_PWM_CHANNEL_A,
     TIMER0_PWM_CHANNEL_B,
     
     NUM_TIMER0_PWM_CHANNELS,
 } timer0_pwm_channel_t;
+
+static inline bool timer0_is_pwm_channel_valid(timer0_pwm_channel_t pwm_channel) {
+    return (unsigned)pwm_channel < NUM_TIMER0_PWM_CHANNELS;
+}
+
+
+typedef void (*timer0_callback_t)(void);
+
+typedef enum {
+    TIMER0_EVENT_COMPA,
+    TIMER0_EVENT_COMPB,
+    TIMER0_EVENT_OVERFLOW,
+    
+    TIMER0_NUM_EVENTS,
+    TIMER0_EVENT_INVALID,
+} timer0_event_t;
+
+static inline bool timer0_is_event_valid(timer0_event_t event) {
+    return (unsigned)event < TIMER0_NUM_EVENTS;
+}
 
 
 error_code_t timer0_init(timer0_mode_t mode);
@@ -34,3 +64,6 @@ error_code_t timer0_enable_callback(timer0_event_t event, bool enable);
 error_code_t timer0_start_clock(timer0_clock_t clock);
 error_code_t timer0_set_mode(timer0_mode_t mode);
 error_code_t timer0_cleanup(void);
+void timer0_fire_isr_compa(void);
+void timer0_fire_isr_compb(void);
+void timer0_fire_isr_ovf(void);

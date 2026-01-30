@@ -11,9 +11,8 @@
 
 
 #include "app/app.h"
-#include "drivers/interrupts.h"
-#include "drivers/timer0.h"
-#include "drivers/gpio.h"
+#include "drivers/timer0_driver.h"
+#include "drivers/gpio_driver.h"
 #include "sim/debug.h"
 
 typedef struct {
@@ -38,7 +37,7 @@ error_code_t app_init(void) {
     ASSERT_OK(timer0_start_clock(TIMER0_CLOCK_1024));
     state.i = 0;
     
-    interrupts_enable();
+    interrupt_enable();
     return ERROR_OK;
 }
 error_code_t app_run(void) {

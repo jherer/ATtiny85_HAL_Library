@@ -11,9 +11,8 @@
 
 
 #include "app/app.h"
-#include "drivers/interrupts.h"
-#include "drivers/gpio.h"
-#include "drivers/timer0.h"
+#include "drivers/gpio_driver.h"
+#include "drivers/timer0_driver.h"
 #include "sim/debug.h"
 
 typedef struct {
@@ -34,7 +33,7 @@ error_code_t app_init(void) {
     ASSERT_OK(gpio_create(&state.led2, GPIO_B2, GPIO_MODE_INPUT_PULLUP));
     ASSERT_OK(gpio_create(&state.led3, GPIO_B3, GPIO_MODE_OUTPUT));
     //ASSERT_OK(gpio_write(&state.led1, 1)); // Causes init error (write input)
-    interrupts_enable();
+    interrupt_enable();
     return ERROR_OK;
 }
 

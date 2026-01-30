@@ -13,5 +13,5 @@
  */
 #pragma once
 
-void interrupts_enable(void);
-void interrupts_disable(void);
+void interrupt_enable(void);
+void interrupt_disable(void);

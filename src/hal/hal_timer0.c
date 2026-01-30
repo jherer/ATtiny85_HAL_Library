@@ -1,8 +1,7 @@
-
-#include "platform.h"
 #include "hal_timer0.h"
+#include "platform.h"
 #include "bitwise.h"
-#include "hal/masks.h"
+#include "masks.h"
 #include "sim/debug.h"
 
 
@@ -47,18 +46,26 @@ uint8_t _get_cs0_bits(timer0_clock_t clock) {
     }
 }
 
+uint8_t _get_com0a_bits(bool pwm_a) {
+    if (pwm_a) {
+        return 0b10;
+    }
+    return 0;
+}
+
+uint8_t _get_com0b_bits(bool pwm_b) {
+    if (pwm_b) {
+        return 0b10;
+    }
+    return 0;
+}
+
 void hal_timer0_set_control_registers(timer0_mode_t mode, timer0_clock_t clock, bool pwm_a, bool pwm_b) {
     debug_println("t0 ctrl", DEBUG_LAYER_HAL);
     uint8_t wgm0_bits = _get_wgm0_bits(mode);
     uint8_t cs0_bits = _get_cs0_bits(clock);
-    uint8_t com0a_bits = 0;
-    uint8_t com0b_bits = 0;
-    if (pwm_a) {
-        com0a_bits = 0b10;
-    }
-    if (pwm_b) {
-        com0b_bits = 0b10;
-    }
+    uint8_t com0a_bits = _get_com0a_bits(pwm_a);
+    uint8_t com0b_bits = _get_com0b_bits(pwm_b);
 
     TCCR0A = _build_control_register_a(wgm0_bits, com0a_bits, com0b_bits);
     debug_println_bin("    TCCR0A", TCCR0A, DEBUG_LAYER_HAL);

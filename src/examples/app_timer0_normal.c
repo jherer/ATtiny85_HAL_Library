@@ -11,9 +11,8 @@
 
 
 #include "app/app.h"
-#include "drivers/interrupts.h"
-#include "drivers/timer0.h"
-#include "drivers/gpio.h"
+#include "drivers/timer0_driver.h"
+#include "drivers/gpio_driver.h"
 #include "sim/debug.h"
 
 typedef struct {
@@ -22,7 +21,7 @@ typedef struct {
 
 static app_state_t state = {0};
 
-void callback0(void) {
+timer0_callback_t callback0(void) {
     gpio_toggle(&state.led0);
 }
 
@@ -31,11 +30,11 @@ error_code_t app_init(void) {
     /* Configure drivers and services here */
     ASSERT_OK(gpio_create(&state.led0, GPIO_B0, GPIO_MODE_OUTPUT));
     ASSERT_OK(timer0_init(TIMER0_MODE_NORMAL));
-    ASSERT_OK(timer0_set_callback(TIMER_EVENT_OVERFLOW, callback0));
-    ASSERT_OK(timer0_enable_callback(TIMER_EVENT_OVERFLOW, true));
+    ASSERT_OK(timer0_set_callback(TIMER0_EVENT_OVERFLOW, callback0));
+    ASSERT_OK(timer0_enable_callback(TIMER0_EVENT_OVERFLOW, true));
     ASSERT_OK(timer0_start_clock(TIMER0_CLOCK_1024));
     
-    interrupts_enable();
+    interrupt_enable();
     return ERROR_OK;
 }
 

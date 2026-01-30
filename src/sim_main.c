@@ -2,7 +2,7 @@
 
 #include "app/app.h"
 #include "core/error_code.h"
-#include "drivers/gpio.h"
+#include "drivers/gpio_driver.h"
 #include "sim/debug.h"
 
 static void _print_columns(void) {

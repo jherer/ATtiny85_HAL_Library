@@ -10,11 +10,6 @@ typedef enum {
     TIMER1_MODE_INVALID,
 } timer1_mode_t;
 
-static inline bool timer1_is_mode_valid(timer1_mode_t mode) {
-    return (unsigned)mode >= TIMER1_NUM_MODES;
-}
-
-
 typedef enum {
     TIMER1_CLOCK_OFF = 0,
     TIMER1_CLOCK_1,
@@ -36,23 +31,3 @@ typedef enum {
     TIMER1_NUM_CLOCKS,
     TIMER1_CLOCK_INVALID,
 } timer1_clock_t;
-
-static inline bool timer1_is_clock_valid(timer1_clock_t clock) {
-    return (unsigned)clock >= TIMER1_NUM_CLOCKS;
-}
-
-
-typedef void (*timer1_callback_t)(void);
-
-typedef enum {
-    TIMER1_EVENT_COMPA,
-    TIMER1_EVENT_COMPB,
-    TIMER1_EVENT_OVERFLOW,
-    
-    TIMER1_NUM_EVENTS,
-    TIMER1_EVENT_INVALID,
-} timer1_event_t;
-
-static inline bool timer1_is_event_valid(timer1_event_t event) {
-    return (unsigned)event < TIMER1_NUM_EVENTS;
-}

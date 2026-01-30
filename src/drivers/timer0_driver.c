@@ -114,6 +114,30 @@ static bool _is_initialized(timer0_state_t *s) {
     return s->initialized;
 }
 
+static inline bool _is_top_variable(timer0_mode_t mode) {
+    return (mode == TIMER0_MODE_CTC) || 
+            (mode == TIMER0_MODE_PWM_VARIABLE_TOP);
+}
+
+static inline bool _is_mode_pwm(timer0_mode_t mode) {
+    return (mode == TIMER0_MODE_PWM_FIXED_TOP) ||
+                (mode == TIMER0_MODE_PWM_VARIABLE_TOP);
+}
+
+static inline bool _is_pwm_channel_free(timer0_pwm_channel_t pwm_channel, timer0_mode_t mode) {
+    bool taken_by_top = (mode == TIMER0_MODE_PWM_VARIABLE_TOP) &&
+            (pwm_channel == TIMER0_PWM_CHANNEL_A);
+    return !taken_by_top;
+}
+
+static inline bool _is_event_mode_compatible(timer0_mode_t mode, timer0_event_t event) {
+    bool invalid = (_is_top_variable(mode)) &&
+                    (event == TIMER0_EVENT_OVERFLOW);
+    return !invalid;
+}
+
+
+
 static timer0_state_t state = {0};
 
 
@@ -125,7 +149,7 @@ error_code_t timer0_init(timer0_mode_t mode) {
         return ERROR_TIMER0_ENUM_UNSUPPORTED;
     }
     bool currently_pwm = ((state.pwm_a) || (state.pwm_b));
-    if (!timer0_is_mode_pwm(&state) && currently_pwm) {
+    if (!_is_mode_pwm(state.mode) && currently_pwm) {
         _cleanup_pwm(&state);
     }
     _set_mode(&state, mode);
@@ -138,7 +162,7 @@ error_code_t timer0_set_top(uint8_t top) {
     if (!_is_initialized(&state)) {
         return ERROR_TIMER0_UNINIT;
     }
-    if (!timer0_is_top_variable(state.mode)) {
+    if (!_is_top_variable(state.mode)) {
         return ERROR_TIMER0_TOP_BAD_MODE;
     }
     _set_top(&state, top);
@@ -153,10 +177,10 @@ error_code_t timer0_pwm_attach(timer0_pwm_channel_t pwm_channel) {
     if (!timer0_is_pwm_channel_valid(pwm_channel)) {
         return ERROR_TIMER0_ENUM_UNSUPPORTED;
     }
-    if (!timer0_is_mode_pwm(&state)) {
+    if (!_is_mode_pwm(state.mode)) {
         return ERROR_TIMER0_PWM_BAD_MODE;
     }
-    if (!_is_mode_pwm_compatible(&state, pwm_channel)) {
+    if (!_is_pwm_channel_free(pwm_channel, state.mode)) {
         return ERROR_TIMER0_PWM_CHANNEL_BAD_MODE;
     }
     _set_pwm_channel(&state, pwm_channel, true);
@@ -165,13 +189,13 @@ error_code_t timer0_pwm_attach(timer0_pwm_channel_t pwm_channel) {
 
 error_code_t timer0_pwm_detach(timer0_pwm_channel_t pwm_channel) {
     debug_println("t0 pwm detach", DEBUG_LAYER_DRIVERS);
-    if (!_is_uninitialized(&state)) {
+    if (!_is_initialized(&state)) {
         return ERROR_TIMER0_UNINIT;
     }
     if (!timer0_is_pwm_channel_valid(pwm_channel)) {
         return ERROR_TIMER0_ENUM_UNSUPPORTED;
     }
-    if (!_is_mode_pwm_compatible(&state, pwm_channel)) {
+    if (!_is_pwm_channel_free(pwm_channel, state.mode)) {
         return ERROR_TIMER0_PWM_CHANNEL_BAD_MODE;
     }
     _set_pwm_channel(&state, pwm_channel, false);
@@ -183,13 +207,13 @@ error_code_t timer0_pwm_set_duty(timer0_pwm_channel_t pwm_channel, uint8_t value
     if (!_is_initialized(&state)) {
         return ERROR_TIMER0_UNINIT;
     }
-    if ((unsigned)pwm_channel >= NUM_TIMER0_PWM_CHANNELS) {
+    if (!timer0_is_pwm_channel_valid(pwm_channel)) {
         return ERROR_TIMER0_ENUM_UNSUPPORTED;
     }
-    if (_is_pwm_invalid(&state)) {
+    if (!_is_mode_pwm(state.mode)) {
         return ERROR_TIMER0_PWM_BAD_MODE;
     }
-    if (_is_pwm_channel_invalid(&state, pwm_channel)) {
+    if (!_is_pwm_channel_free(pwm_channel, state.mode)) {
         return ERROR_TIMER0_PWM_CHANNEL_BAD_MODE;
     }
 
@@ -199,13 +223,13 @@ error_code_t timer0_pwm_set_duty(timer0_pwm_channel_t pwm_channel, uint8_t value
 
 error_code_t timer0_set_callback(timer0_event_t event, timer0_callback_t callback) {
     debug_println("t0 set callback", DEBUG_LAYER_DRIVERS);
-    if (_is_uninitialized(&state)) {
+    if (!_is_initialized(&state)) {
         return ERROR_TIMER0_UNINIT;
     }
     if (!timer0_is_event_valid(event)) {
         return ERROR_TIMER0_ENUM_UNSUPPORTED;
     }
-    if (timer0_is_event_valid(event)) {
+    if (!_is_event_mode_compatible(event, state.mode)) {
         return ERROR_TIMER0_EVENT_BAD_MODE;
     }
     _set_callback(&state, event, callback);
@@ -214,13 +238,13 @@ error_code_t timer0_set_callback(timer0_event_t event, timer0_callback_t callbac
 
 error_code_t timer0_enable_callback(timer0_event_t event, bool enable) {
     debug_println("t0 enable callback", DEBUG_LAYER_DRIVERS);
-    if (_is_uninitialized(&state)) {
+    if (!_is_initialized(&state)) {
         return ERROR_TIMER0_UNINIT;
     }
-    if ((unsigned)event >= TIMER0_NUM_EVENTS) {
+    if (!timer0_is_event_valid(event)) {
         return ERROR_TIMER0_ENUM_UNSUPPORTED;
     }
-    if (timer0_is_event_valid(event)) {
+    if (!timer0_is_event_valid(event)) {
         return ERROR_TIMER0_EVENT_BAD_MODE;
     }
     _enable_callback(&state, event, enable);
@@ -229,7 +253,7 @@ error_code_t timer0_enable_callback(timer0_event_t event, bool enable) {
 
 error_code_t timer0_start_clock(timer0_clock_t clock) {
     debug_println("t0 start clock", DEBUG_LAYER_DRIVERS);
-    if (_is_uninitialized(&state)) {
+    if (!_is_initialized(&state)) {
         return ERROR_TIMER0_UNINIT;
     }
     if (!timer0_is_clock_valid(clock)) {
@@ -241,13 +265,13 @@ error_code_t timer0_start_clock(timer0_clock_t clock) {
 
 error_code_t timer0_set_mode(timer0_mode_t mode) {
     debug_println("t0 set mode", DEBUG_LAYER_DRIVERS);
-    if (_is_uninitialized(&state)) {
+    if (!_is_initialized(&state)) {
         return ERROR_TIMER0_UNINIT;
     }
     if (!timer0_is_mode_valid(mode)) {
         return ERROR_TIMER0_ENUM_UNSUPPORTED;
     }
-    if (_is_pwm_invalid(&state)) {
+    if (!_is_mode_pwm(mode)) {
         _cleanup_pwm(&state);
     }
     _set_mode(&state, mode);

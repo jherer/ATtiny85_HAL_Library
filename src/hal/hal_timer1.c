@@ -1,7 +1,7 @@
 #include "hal_timer1.h"
 #include "platform.h"
 #include "bitwise.h"
-#include "hal/masks.h"
+#include "masks.h"
 #include "sim/debug.h"
 
 

@@ -1,33 +1,114 @@
-MAKE = mingw32-make
-MCU_MAKEFILE = makefile.mcu
-SIM_MAKEFILE = makefile.sim
+BUILD ?= HW
+MODULES = system services drivers hal platform sim
 
-.PHONY: flash build_mcu clean_mcu sim build_sim clean_sim build clean 
+# SOURCES
+SRC_DIRS = $(MODULES:%=src/%)
+SRCS = $(foreach dir, $(SRC_DIRS), $(wildcard $(dir)/*.c))
+SRCS += src/examples/app_gpio.c # ADD APP SOURCESs
 
-
-# PHYSICAL
-flash: build_mcu
-	$(MAKE) -f $(MCU_MAKEFILE) flash
-
-build_mcu:
-	$(MAKE) -f $(MCU_MAKEFILE) build
-
-clean_mcu:
-	$(MAKE) -f $(MCU_MAKEFILE) clean
+# INCLUDES
+INC_DIRS = $(MODULES:%=src/%/include) include
+INCS = $(foreach dir, $(INC_DIRS), $(wildcard $(dir)/*.h))
+OBJS = $(SRCS:%.c=$(BUILD_DIR)/%.o)
+DEPS =  $(OBJS:%.o=%.d)
 
 
-# SIMULATOR
-sim: build_sim
-	$(MAKE) -f $(SIM_MAKEFILE)
+# Tell the makefile these are command names, not files
+.PHONY: build run clean
 
-build_sim:
-	$(MAKE) -f $(SIM_MAKEFILE) build
+F_CPU	= 16000000UL
+INCFLAGS = $(foreach dir, $(INC_DIRS), -I$(dir))
 
-clean_sim:
-	$(MAKE) -f $(SIM_MAKEFILE) clean
+ # compiler flags
+CFLAGS	= \
+$(INCFLAGS) \
+-DF_CPU=$(F_CPU) \
+-Wall \
+-Wno-unused-function \
+-Wno-unused-variable \
+-Os \
+-std=gnu11 \
+-MMD -MP \
+
+LDFLAGS =  # linker flags
+
+ifeq ($(OS),Windows_NT)
+	RD = powershell.exe -Command "Remove-Item -Recurse" -Path
+else
+    RD = rm -rf
+endif
 
 
-# ALL
-build: build_mcu build_sim
-clean: clean_mcu clean_sim
+# ----------------------------
+#	HARDWARE BUILD
+# ----------------------------
+ifeq ($(BUILD), HW)
+CFLAGS += -DHW
+BUILD_DIR 	= build/mcu
+TARGET 		= $(BUILD_DIR)/firmware
+SRCS += src/main.c
+
+# Toolchain
+OBJCOPY	= avr-objcopy
+PORT	= COM6	# COM port may change
+MCU		= attiny85
+ISP		= stk500v1
+BAUD	= 19200
+# avrdude.config file path
+CONF	= C:\Users\joshu\AppData\Local\Arduino15\packages\arduino\tools\avrdude\6.3.0-arduino17/etc/avrdude.conf
+CC		= avr-gcc
+
+CFLAGS += -mmcu=$(MCU) # add HW compiler flags
+LDFLAGS	= -mmcu=$(MCU) # add HW linker flags
+ # avrdude flags
+AVRDUDE_FLAGS = -p$(MCU) \
+-P$(PORT) \
+-b$(BAUD) \
+-c$(ISP) \
+-C$(CONF)
+
+$(TARGET).elf: $(OBJS)
+	$(CC) $(LDFLAGS) $^ -o $@
+
+$(TARGET).hex: $(TARGET).elf
+	$(OBJCOPY) -O ihex $< $@
+
+run: $(TARGET).hex build
+	avrdude $(AVRDUDE_FLAGS) -U flash:w:'$<':a
+
+build: $(TARGET).hex
+
+endif
+
+
+# ----------------------------
+#	SIMULATION BUILD
+# ----------------------------
+ifeq ($(BUILD), SIM)
+CFLAGS += -DSIM
+BUILD_DIR = build/sim
+TARGET = $(BUILD_DIR)/sim.exe
+MODULES += sim
+SRCS += src/sim_main.c
+CC = C:/mingw64/bin/gcc.exe # Compiler
+
+build: $(TARGET)
+run: $(TARGET)
+	$(TARGET)
+
+$(TARGET): $(OBJS)
+	$(CC) $(LDFLAGS) $^ -o $@
+endif
+
+
+$(BUILD_DIR)/%.o: %.c
+	@if not exist "$(dir $@)" mkdir "$(dir $@)"
+	$(CC) $(CFLAGS) -c $< -o $@
+
+-include $(DEPS)
+
+clean:
+	$(RD) $(BUILD_DIR)
+
+
 

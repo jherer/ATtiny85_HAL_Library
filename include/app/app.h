@@ -12,7 +12,7 @@
 
 #pragma once
 #include "core/error_code.h"
-#include "drivers/interrupts.h"
+#include "drivers/interrupt_driver.h"
 
 // Wrap any functions in app_init() or app_run() that return error_code_t
 // To return the error to the main

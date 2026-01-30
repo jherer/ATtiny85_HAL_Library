@@ -1,7 +1,7 @@
 #include "sim/debug.h"
 #include <stdbool.h>
 
-#ifdef HAL_SIM
+#ifdef SIM
     #include <stdio.h>
     #include <unistd.h>
     
@@ -27,7 +27,7 @@ static void _clear_key_buffer(void) {
 }
 
 static bool _layer_is_enabled(debug_layer_t layer) {
-    #ifdef HAL_SIM
+    #ifdef SIM
     switch (layer) {
     case DEBUG_LAYER_HAL:
         #ifdef ENABLE_DEBUG_LAYER_HAL
@@ -79,19 +79,19 @@ static bool _layer_is_enabled(debug_layer_t layer) {
 // PUBLIC API
 
 void debug_init(void) {
-    #ifdef HAL_SIM
+    #ifdef SIM
         setbuf(stdout, NULL);
     #endif
 }
 
 void debug_delay_ms(uint32_t time_ms) {
-    #ifdef HAL_SIM
+    #ifdef SIM
         usleep(((uint64_t)time_ms) * 1000);
     #endif
 }
 
 void debug_print(char* message, debug_layer_t layer) {
-    #ifdef HAL_SIM
+    #ifdef SIM
         if (_layer_is_enabled(layer)) {
             printf(message);
             debug_delay_ms(DEBUG_PRINT_DELAY_MS);
@@ -100,7 +100,7 @@ void debug_print(char* message, debug_layer_t layer) {
 }
 
 void debug_println(char* message, debug_layer_t layer) {
-    #ifdef HAL_SIM
+    #ifdef SIM
         if (_layer_is_enabled(layer)) {
             printf(message);
             printf("\n");
@@ -110,7 +110,7 @@ void debug_println(char* message, debug_layer_t layer) {
 }
 
 void debug_println_bin(char* message, uint8_t bin, debug_layer_t layer) {
-    #ifdef HAL_SIM
+    #ifdef SIM
         if (_layer_is_enabled(layer)) {
             printf(message);
             printf(": ");
@@ -131,7 +131,7 @@ void debug_println_bin(char* message, uint8_t bin, debug_layer_t layer) {
 }
 
 void debug_println_dec(char* message, uint8_t dec, debug_layer_t layer) {
-    #ifdef HAL_SIM
+    #ifdef SIM
         if (_layer_is_enabled(layer)) {
             printf(message);
             printf(": %d\n", dec);
@@ -141,7 +141,7 @@ void debug_println_dec(char* message, uint8_t dec, debug_layer_t layer) {
 }
 
 void debug_println_hex(char* message, uint8_t hex, debug_layer_t layer) {
-    #ifdef HAL_SIM 
+    #ifdef SIM 
         if (_layer_is_enabled(layer)) {
             printf(message);
             printf(": x%02X\n", hex);
@@ -151,7 +151,7 @@ void debug_println_hex(char* message, uint8_t hex, debug_layer_t layer) {
 }
 
 void debug_println_title(char* message, uint8_t width, debug_layer_t layer) {
-    #ifdef HAL_SIM
+    #ifdef SIM
         if (_layer_is_enabled(layer)) {
             printf("\n\n[");
             //printf(left);
@@ -172,7 +172,7 @@ void debug_println_title(char* message, uint8_t width, debug_layer_t layer) {
 }
 
 void debug_pause(char* message, debug_layer_t layer) {
-    #ifdef HAL_SIM
+    #ifdef SIM
         if (_layer_is_enabled(layer)) {
             printf(message);
             // Read and discard all characters until the newline character is found.
@@ -191,7 +191,7 @@ void debug_pause(char* message, debug_layer_t layer) {
 }
 
 void debug_yield_loop(void) {
-    #ifdef HAL_SIM
+    #ifdef SIM
         debug_delay_ms(DEBUG_YIELD_LOOP_DELAY_MS);
     #endif
 }

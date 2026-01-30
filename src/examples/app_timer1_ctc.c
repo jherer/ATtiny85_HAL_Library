@@ -9,11 +9,10 @@
  * @version 1.0
  */
 
-
+/*
 #include "app/app.h"
-#include "drivers/interrupts.h"
-#include "drivers/timer1.h"
-#include "drivers/gpio.h"
+#include "drivers/timer1_driver.h"
+#include "drivers/gpio_driver.h"
 #include "sim/debug.h"
 
 typedef struct {
@@ -29,7 +28,7 @@ void callback0(void) {
 
 error_code_t app_init(void) {
     debug_println("Timer1 CTC mode example", DEBUG_LAYER_APP);
-    /* Configure drivers and services here */
+    // Configure drivers and services here 
     ASSERT_OK(gpio_create(&state.led0, GPIO_B0, GPIO_MODE_OUTPUT));
     ASSERT_OK(timer1_init(TIMER1_MODE_CTC));
     ASSERT_OK(timer1_set_callback(TIMER_EVENT_COMPA, callback0));
@@ -38,11 +37,11 @@ error_code_t app_init(void) {
     ASSERT_OK(timer1_start_clock(TIMER1_CLOCK_1024));
     state.i = 0;
     
-    interrupts_enable();
+    interrupt_enable();
     return ERROR_OK;
 }
 error_code_t app_run(void) {
-    /* Run the main loop of the program here */
+    // Run the main loop of the program here 
     ASSERT_OK(timer1_set_top(state.i));
     //ASSERT_OK(timer0_enable_callback(TIMER_EVENT_OVERFLOW, true));
     debug_println("Running", DEBUG_LAYER_APP);
@@ -51,4 +50,4 @@ error_code_t app_run(void) {
         ASSERT_OK(timer1_cleanup()); // De-initialized timer, causing init error next call
     }
     return ERROR_OK;
-}
+}*/
