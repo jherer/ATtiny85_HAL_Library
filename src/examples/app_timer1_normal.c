@@ -13,42 +13,44 @@
 #include "app/app.h"
 #include "drivers/timer1_driver.h"
 #include "drivers/gpio_driver.h"
-#include "sim/debug.h"
+#include "platform/debug.h"
 
 typedef struct {
     gpio_t led0;
-    uint8_t i;
+    gpio_t led1;
+    uint16_t i;
 } app_state_t;
 
 static app_state_t state = {0};
 
 void callback0(void) {
-    debug_println("HIIIII", DEBUG_LAYER_APP);
+    //DEBUG_PRINTLN("HIIIII", DEBUG_LAYER_APP);
     gpio_toggle(&state.led0);
 }
 
 error_code_t app_init(void) {
-    debug_println("Timer1 CTC mode example", DEBUG_LAYER_APP);
+    DEBUG_PRINTLN("Timer1 CTC mode example", DEBUG_LAYER_APP);
     // Configure drivers and services here 
     ASSERT_OK(gpio_create(&state.led0, GPIO_B0, GPIO_MODE_OUTPUT));
-    ASSERT_OK(timer1_init(TIMER1_MODE_CTC));
-    ASSERT_OK(timer1_set_callback(TIMER1_EVENT_COMPA, callback0));
-    ASSERT_OK(timer1_enable_callback(TIMER1_EVENT_COMPA, true));
-    ASSERT_OK(timer1_set_top(100));
-    ASSERT_OK(timer1_start_clock(TIMER1_CLOCK_1024));
+    ASSERT_OK(gpio_create(&state.led1, GPIO_B1, GPIO_MODE_OUTPUT));
+    ASSERT_OK(timer1_init(TIMER1_EVENT_OVERFLOW));
+    ASSERT_OK(timer1_set_callback(TIMER1_EVENT_OVERFLOW, callback0));
+    ASSERT_OK(timer1_enable_callback(TIMER1_EVENT_OVERFLOW, true));
+    ASSERT_OK(timer1_start_clock(TIMER1_CLOCK_16834));
     state.i = 0;
     
     interrupt_enable();
     return ERROR_OK;
 }
 error_code_t app_run(void) {
-    // Run the main loop of the program here 
-    ASSERT_OK(timer1_set_top(state.i));
+    // Run the main loop of the program here
     //ASSERT_OK(timer0_enable_callback(TIMER_EVENT_OVERFLOW, true));
-    debug_println("Running", DEBUG_LAYER_APP);
-    state.i += 8;
-    if (state.i > 100) {
-        ASSERT_OK(timer1_cleanup()); // De-initialized timer, causing init error next call
+    //DEBUG_PRINTLN("Running", DEBUG_LAYER_APP);
+    state.i++;
+    if (state.i > 5000) {
+        gpio_toggle(&state.led1);
+        state.i = 0;
+        //ASSERT_OK(timer1_cleanup()); // De-initialized timer, causing init error next call
     }
     return ERROR_OK;
 }

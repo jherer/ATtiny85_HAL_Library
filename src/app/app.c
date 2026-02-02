@@ -12,7 +12,7 @@
 
 #include "app/app.h"
 #include "drivers/gpio_driver.h"
-#include "sim/debug.h"
+#include "platform/debug.h"
 
 // Add state variables in this struct
 typedef struct {
@@ -23,7 +23,7 @@ static app_state_t state = {0};
 
 error_code_t app_init(void) {
     // Configure drivers and services here
-    debug_println("App Template", DEBUG_LAYER_APP);
+    DEBUG_PRINTLN("App Template", DEBUG_LAYER_APP);
 
     interrupt_enable();
     return ERROR_OK;
@@ -31,6 +31,5 @@ error_code_t app_init(void) {
 
 error_code_t app_run(void) {
     // Run the main loop of the program here
-    
     return ERROR_OK;
 }

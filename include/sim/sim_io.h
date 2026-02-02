@@ -21,6 +21,7 @@ typedef struct {
     uint8_t OCR1A_SIM;
     uint8_t OCR1B_SIM;
     uint8_t OCR1C_SIM;
+    uint8_t PLLCSR_SIM;
 
     // STATUS / INTERRUPT
     uint8_t SREG_SIM;
@@ -78,6 +79,7 @@ extern sim_io_t sim_io;
 #define OCIE1B 5
 #define OCIE1A 6
 
+#define PLLCSR sim_io.PLLCSR_SIM
 
 void sei(void);
 void cli(void);

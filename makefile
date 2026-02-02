@@ -1,25 +1,27 @@
+# Build mode: hardware (HW) or simulation (SIM)
 BUILD ?= HW
-MODULES = system services drivers hal platform sim
+MODULES = system services drivers hal platform
 
-# SOURCES
+# Sources
 SRC_DIRS = $(MODULES:%=src/%)
 SRCS = $(foreach dir, $(SRC_DIRS), $(wildcard $(dir)/*.c))
-SRCS += src/examples/app_timer1_ctc.c # ADD APP SOURCESs
+SRCS += src/app/app.c # ADD APP SOURCESs
 
-# INCLUDES
-INC_DIRS = $(MODULES:%=src/%/include) include
+# Includes
+INC_DIRS = include src
 INCS = $(foreach dir, $(INC_DIRS), $(wildcard $(dir)/*.h))
 OBJS = $(SRCS:%.c=$(BUILD_DIR)/%.o)
-DEPS =  $(OBJS:%.o=%.d)
-
+DEPS = $(OBJS:%.o=%.d)
 
 # Tell the makefile these are command names, not files
 .PHONY: build run clean
 
+
+
+# Compiler flags
 F_CPU	= 16000000UL
 INCFLAGS = $(foreach dir, $(INC_DIRS), -I$(dir))
 
- # compiler flags
 CFLAGS	= \
 $(INCFLAGS) \
 -DF_CPU=$(F_CPU) \
@@ -30,8 +32,10 @@ $(INCFLAGS) \
 -std=gnu11 \
 -MMD -MP \
 
-LDFLAGS =  # linker flags
+LDFLAGS =  # Linker flags
 
+
+# Cross-compatible remove directory command
 ifeq ($(OS),Windows_NT)
 	RD = powershell.exe -Command "Remove-Item -Recurse" -Path
 else
@@ -46,20 +50,22 @@ ifeq ($(BUILD), HW)
 CFLAGS += -DHW
 BUILD_DIR 	= build/mcu
 TARGET 		= $(BUILD_DIR)/firmware
-SRCS += src/main.c
+SRCS += src/main_hw.c # Add hardware main to sources
 
 # Toolchain
 OBJCOPY	= avr-objcopy
-PORT	= COM6	# COM port may change
-MCU		= attiny85
-ISP		= stk500v1
-BAUD	= 19200
+PORT	= COM6	# COM port may change based on USB driver setup or which USB port you use
+MCU		= attiny85 # Microcontroller
+ISP		= stk500v1 # In-circuit serial programmer method
+BAUD	= 19200 # Baudrate
+
 # avrdude.config file path
 CONF	= C:\Users\joshu\AppData\Local\Arduino15\packages\arduino\tools\avrdude\6.3.0-arduino17/etc/avrdude.conf
-CC		= avr-gcc
+CC		= avr-gcc # Compiler command
 
-CFLAGS += -mmcu=$(MCU) # add HW compiler flags
-LDFLAGS	= -mmcu=$(MCU) # add HW linker flags
+CFLAGS += -mmcu=$(MCU) # Add HW compiler flags
+LDFLAGS	= -mmcu=$(MCU) # Add HW linker flags
+
  # avrdude flags
 AVRDUDE_FLAGS = -p$(MCU) \
 -P$(PORT) \
@@ -73,11 +79,11 @@ $(TARGET).elf: $(OBJS)
 $(TARGET).hex: $(TARGET).elf
 	$(OBJCOPY) -O ihex $< $@
 
+# Flash firmware to microcontroller
 run: $(TARGET).hex build
 	avrdude $(AVRDUDE_FLAGS) -U flash:w:'$<':a
 
 build: $(TARGET).hex
-
 endif
 
 
@@ -89,16 +95,18 @@ CFLAGS += -DSIM
 BUILD_DIR = build/sim
 TARGET = $(BUILD_DIR)/sim.exe
 MODULES += sim
-SRCS += src/sim_main.c
+SRCS += src/main_sim.c # Add simulation main to sources
 CC = C:/mingw64/bin/gcc.exe # Compiler
 
 build: $(TARGET)
+
 run: $(TARGET)
 	$(TARGET)
 
 $(TARGET): $(OBJS)
 	$(CC) $(LDFLAGS) $^ -o $@
 endif
+
 
 
 $(BUILD_DIR)/%.o: %.c

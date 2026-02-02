@@ -13,7 +13,7 @@
 #include "app/app.h"
 #include "drivers/gpio_driver.h"
 #include "drivers/timer0_driver.h"
-#include "sim/debug.h"
+#include "platform/debug.h"
 
 typedef struct {
     uint8_t a;
@@ -26,7 +26,7 @@ typedef struct {
 static app_state_t state = {0};
 
 error_code_t app_init(void) {
-    debug_println("GPIO example", DEBUG_LAYER_APP);
+    DEBUG_PRINTLN("GPIO example", DEBUG_LAYER_APP);
     /* Configure drivers and services here */
     ASSERT_OK(gpio_create(&state.led0, GPIO_B0, GPIO_MODE_OUTPUT));
     ASSERT_OK(gpio_create(&state.led1, GPIO_B1, GPIO_MODE_INPUT));
@@ -39,6 +39,10 @@ error_code_t app_init(void) {
 
 error_code_t app_run(void) {
     /* Run the main loop of the program here */
-    ASSERT_OK(gpio_toggle(&state.led0));
+    //while (1) {
+    //ASSERT_OK(gpio_toggle(&state.led0));
+    ASSERT_OK(gpio_write(&state.led3, gpio_read(&state.led2)));
+    //ASSERT_OK(0x27);
+    //}
     return ERROR_OK;
 }

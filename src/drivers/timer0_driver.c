@@ -1,8 +1,8 @@
 #include "drivers/timer0_driver.h"
-#include "hal_timer0.h"
+#include "hal/hal_timer0.h"
 #include <stdlib.h>
 #include "core/error_code.h"
-#include "sim/debug.h"
+#include "platform/debug.h"
 
 typedef struct {
     bool initialized;
@@ -49,7 +49,6 @@ static void _set_pwm_channel(timer0_state_t *s, timer0_pwm_channel_t pwm_channel
     case TIMER0_PWM_CHANNEL_B:
         s->pwm_b = enable;
         break;
-    case NUM_TIMER0_PWM_CHANNELS:
     default:
         break;
     }
@@ -71,7 +70,6 @@ static void _set_pwm_duty(timer0_state_t *s, timer0_pwm_channel_t pwm_channel, u
     case TIMER0_PWM_CHANNEL_B:
         hal_timer0_set_output_compare_register_b(value);
         break;
-    case NUM_TIMER0_PWM_CHANNELS:
     default:
         break;
     }
@@ -144,7 +142,7 @@ static timer0_state_t state = {0};
 // PUBLIC API
 
 error_code_t timer0_init(timer0_mode_t mode) {
-    debug_println("t0 init", DEBUG_LAYER_DRIVERS);
+    DEBUG_PRINTLN("t0 init", DEBUG_LAYER_DRIVERS);
     if (!timer0_is_mode_valid(mode)) {
         return ERROR_TIMER0_ENUM_UNSUPPORTED;
     }
@@ -158,7 +156,7 @@ error_code_t timer0_init(timer0_mode_t mode) {
 }
 
 error_code_t timer0_set_top(uint8_t top) {
-    debug_println_dec("t0 set top", top, DEBUG_LAYER_DRIVERS);
+    DEBUG_PRINTLN_DEC("t0 set top", top, DEBUG_LAYER_DRIVERS);
     if (!_is_initialized(&state)) {
         return ERROR_TIMER0_UNINIT;
     }
@@ -170,7 +168,7 @@ error_code_t timer0_set_top(uint8_t top) {
 }
 
 error_code_t timer0_pwm_attach(timer0_pwm_channel_t pwm_channel) {
-    debug_println("t0 pwm attatch", DEBUG_LAYER_DRIVERS);
+    DEBUG_PRINTLN("t0 pwm attatch", DEBUG_LAYER_DRIVERS);
     if (!_is_initialized(&state)) {
         return ERROR_TIMER0_UNINIT;
     }
@@ -188,7 +186,7 @@ error_code_t timer0_pwm_attach(timer0_pwm_channel_t pwm_channel) {
 }
 
 error_code_t timer0_pwm_detach(timer0_pwm_channel_t pwm_channel) {
-    debug_println("t0 pwm detach", DEBUG_LAYER_DRIVERS);
+    DEBUG_PRINTLN("t0 pwm detach", DEBUG_LAYER_DRIVERS);
     if (!_is_initialized(&state)) {
         return ERROR_TIMER0_UNINIT;
     }
@@ -203,7 +201,7 @@ error_code_t timer0_pwm_detach(timer0_pwm_channel_t pwm_channel) {
 }
 
 error_code_t timer0_pwm_set_duty(timer0_pwm_channel_t pwm_channel, uint8_t value) {
-    debug_println("t0 pwm set duty", DEBUG_LAYER_DRIVERS);
+    DEBUG_PRINTLN("t0 pwm set duty", DEBUG_LAYER_DRIVERS);
     if (!_is_initialized(&state)) {
         return ERROR_TIMER0_UNINIT;
     }
@@ -222,7 +220,7 @@ error_code_t timer0_pwm_set_duty(timer0_pwm_channel_t pwm_channel, uint8_t value
 }
 
 error_code_t timer0_set_callback(timer0_event_t event, timer0_callback_t callback) {
-    debug_println("t0 set callback", DEBUG_LAYER_DRIVERS);
+    DEBUG_PRINTLN("t0 set callback", DEBUG_LAYER_DRIVERS);
     if (!_is_initialized(&state)) {
         return ERROR_TIMER0_UNINIT;
     }
@@ -237,14 +235,14 @@ error_code_t timer0_set_callback(timer0_event_t event, timer0_callback_t callbac
 }
 
 error_code_t timer0_enable_callback(timer0_event_t event, bool enable) {
-    debug_println("t0 enable callback", DEBUG_LAYER_DRIVERS);
+    DEBUG_PRINTLN("t0 enable callback", DEBUG_LAYER_DRIVERS);
     if (!_is_initialized(&state)) {
         return ERROR_TIMER0_UNINIT;
     }
     if (!timer0_is_event_valid(event)) {
         return ERROR_TIMER0_ENUM_UNSUPPORTED;
     }
-    if (!timer0_is_event_valid(event)) {
+    if (!_is_event_mode_compatible(event, state.mode)) {
         return ERROR_TIMER0_EVENT_BAD_MODE;
     }
     _enable_callback(&state, event, enable);
@@ -252,7 +250,7 @@ error_code_t timer0_enable_callback(timer0_event_t event, bool enable) {
 }
 
 error_code_t timer0_start_clock(timer0_clock_t clock) {
-    debug_println("t0 start clock", DEBUG_LAYER_DRIVERS);
+    DEBUG_PRINTLN("t0 start clock", DEBUG_LAYER_DRIVERS);
     if (!_is_initialized(&state)) {
         return ERROR_TIMER0_UNINIT;
     }
@@ -264,7 +262,7 @@ error_code_t timer0_start_clock(timer0_clock_t clock) {
 }
 
 error_code_t timer0_set_mode(timer0_mode_t mode) {
-    debug_println("t0 set mode", DEBUG_LAYER_DRIVERS);
+    DEBUG_PRINTLN("t0 set mode", DEBUG_LAYER_DRIVERS);
     if (!_is_initialized(&state)) {
         return ERROR_TIMER0_UNINIT;
     }
@@ -279,7 +277,10 @@ error_code_t timer0_set_mode(timer0_mode_t mode) {
 }
 
 error_code_t timer0_cleanup(void) {
-    debug_println("t0 cleanup", DEBUG_LAYER_DRIVERS);
+    DEBUG_PRINTLN("t0 cleanup", DEBUG_LAYER_DRIVERS);
+    if (!_is_initialized(&state)) {
+        return ERROR_TIMER0_UNINIT;
+    }
     _set_clock(&state, TIMER0_CLOCK_OFF);
     _cleanup_pwm(&state);
     _enable_callback(&state, TIMER0_EVENT_COMPA, false);

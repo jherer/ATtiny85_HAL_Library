@@ -7,9 +7,9 @@
     #include <util/delay.h>
 #endif
 
+
 #ifdef SIM
-    #include "sim_io.h"
-    #include "sim/debug.h"
+    #include "sim/sim_io.h"
     static inline void _delay_ms(uint16_t time_ms) {
         /*debug_delay_ms(time_ms);*/
     }

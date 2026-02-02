@@ -1,8 +1,8 @@
 #include "drivers/gpio_driver.h"
 #include <stdlib.h>
-#include "hal_gpio.h"
+#include "hal/hal_gpio.h"
 #include <stdlib.h>
-#include "sim/debug.h"
+#include "platform/debug.h"
 
 error_code_t gpio_create(gpio_t *gpio, gpio_id_t gpio_id, gpio_mode_t mode) {
     *gpio = ((gpio_t) {
@@ -10,7 +10,7 @@ error_code_t gpio_create(gpio_t *gpio, gpio_id_t gpio_id, gpio_mode_t mode) {
         .mode = GPIO_MODE_UNINIT,
         .state = false,
     });
-    debug_println_hex("GPIO created at", gpio_id, DEBUG_LAYER_DRIVERS);
+    DEBUG_PRINTLN_HEX("GPIO created at", gpio_id, DEBUG_LAYER_DRIVERS);
 
     return gpio_set_mode(gpio, mode);
 }
@@ -39,7 +39,7 @@ error_code_t gpio_set_mode(gpio_t *gpio, gpio_mode_t mode) {
         return ERROR_GPIO_MODE_UNSUPPORTED;
     }
     gpio->mode = mode;
-    debug_println_hex("GPIO mode set to", mode, DEBUG_LAYER_DRIVERS);
+    DEBUG_PRINTLN_HEX("GPIO mode set to", mode, DEBUG_LAYER_DRIVERS);
     return ERROR_OK;
 }
 

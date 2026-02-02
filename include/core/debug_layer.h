@@ -1,0 +1,10 @@
+typedef enum {
+    DEBUG_LAYER_HAL,
+    DEBUG_LAYER_DRIVERS,
+    DEBUG_LAYER_SERVICES,
+    DEBUG_LAYER_APP,
+    DEBUG_LAYER_MAIN,
+    DEBUG_LAYER_SIM,
+
+    DEBUG_NUM_LAYERS,
+} debug_layer_t;

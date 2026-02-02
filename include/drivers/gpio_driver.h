@@ -14,10 +14,10 @@
 #include "core/error_code.h"
 #include <stdbool.h>
 
-#define ERROR_GPIO_UNINIT    (ERROR_MODULE_GPIO | 0x02)
-#define ERROR_GPIO_MODE_UNSUPPORTED (ERROR_MODULE_GPIO | 0x03)
-#define ERROR_GPIO_NULL_POINTER     (ERROR_MODULE_GPIO | 0x04)
-#define ERROR_GPIO_WRITE_INPUT      (ERROR_MODULE_GPIO | 0x05)
+#define ERROR_GPIO_UNINIT           (ERROR_MODULE_GPIO | 0x01)
+#define ERROR_GPIO_MODE_UNSUPPORTED (ERROR_MODULE_GPIO | 0x02)
+#define ERROR_GPIO_NULL_POINTER     (ERROR_MODULE_GPIO | 0x03)
+#define ERROR_GPIO_WRITE_INPUT      (ERROR_MODULE_GPIO | 0x04)
 
 // Enum for the modes (data direction) settings of a pin
 typedef enum {

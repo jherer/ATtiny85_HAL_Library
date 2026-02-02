@@ -1,15 +1,14 @@
 #include "app/app.h"
-#include "core/error_code.h"
 #include "system/fault.h"
 
 #define CHECK_FAULT
 
 int main(void) {
     error_code_t init_err = app_init();
-
+    
     #ifdef CHECK_FAULT
         if (init_err != ERROR_OK) {
-            fault_panic(init_err);
+            fault_fatal(init_err);
         }
     #endif
 
@@ -18,7 +17,7 @@ int main(void) {
         
         #ifdef CHECK_FAULT
             if (run_err != ERROR_OK) {
-                fault_panic(run_err);
+                fault_fatal(run_err);
             }
         #endif
     }
