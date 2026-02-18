@@ -1,10 +1,9 @@
 #include <app/app.h>
 #include <drivers/gpio_driver.h>
-#include <services/pwm_service.h>
+#include <drivers/timer1_driver.h>
 #include <platform/debug.h>
 
 typedef struct {
-    gpio_t led0;
     gpio_t btn0;
     uint8_t stage;
     bool last_btn;
@@ -12,28 +11,24 @@ typedef struct {
 
 static app_state_t state = {0};
 
-void callback0(void) {
-    gpio_toggle(&state.led0);
-}
-
-#define APP_PWM_PIN PWM_PIN_PB1
-#define APP_NUM_STAGES 7
+#define APP_PWM_PIN PWM_PIN_PB4
+#define APP_NUM_STAGES 8
 
 error_code_t app_init(void) {
     DEBUG_PRINTLN("pwm service test", DEBUG_LAYER_APP);
-    ASSERT_OK(pwm_service_init());
-    ASSERT_OK(pwm_claim(APP_PWM_PIN, 1000, 127));
+    ASSERT_OK(gpio_create(&state.btn0, GPIO_B0, GPIO_MODE_INPUT_PULLUP));
+    ASSERT_OK(timer1_init(TIMER1_MODE_PWM_VARIABLE_TOP));
+    ASSERT_OK(timer1_pwm_attach(TIMER1_PWM_CHANNEL_A));
     interrupt_enable();
+    state.stage = 0;
     return ERROR_OK;
 }
 
 error_code_t app_run(void) {
-    uint32_t freq = 0;
-    uint32_t duty = 127;
-
     bool curr_btn = gpio_read(&state.btn0);
-    if (state.last_btn && !state.last_btn) {
-
+    if (state.last_btn && !curr_btn) {
+        uint32_t freq = 1000;
+        uint32_t duty = 127;
         switch (state.stage) {
         case 0:
             freq = 1000;
@@ -68,15 +63,17 @@ error_code_t app_run(void) {
             duty = 1;
             break;
         }
-
+        ASSERT_OK(pwm_set_frequency(APP_PWM_PIN, freq));
+        ASSERT_OK(pwm_set_duty(APP_PWM_PIN, duty));
 
         if (state.stage >= APP_NUM_STAGES) {
             state.stage = 0;
+        } else {
+            state.stage++;
         }
     }
-    state.last_btn = curr_btn;
 
-    ASSERT_OK()
+    state.last_btn = curr_btn;
 
     return ERROR_OK;
 }

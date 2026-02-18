@@ -17,17 +17,11 @@
 #ifdef HW
     #include <avr/io.h>
     #include <avr/interrupt.h>
-    #include <util/delay.h>
 #endif
 
 
 #ifdef SIM
     #include <sim/sim_io.h>
-    static inline void _delay_ms(uint16_t time_ms) {
-        /*debug_delay_ms(time_ms);*/
-    }
-
-    
     #define PORTB sim_io_state.PORTB_SIM
     #define PINB sim_io_state.PINB_SIM
     #define DDRB sim_io_state.DDRB_SIM
@@ -51,6 +45,12 @@
     #define ADMUX sim_io_state.ADMUX_SIM
     #define ADCSRA sim_io_state.ADCSRA_SIM
     #define ADCH sim_io_state.ADCH_SIM
+
+    #define USICR sim_io_state.USICR_SIM
+    #define USIDR sim_io_state.USIDR_SIM
+    #define USIBR sim_io_state.USIBR_SIM
+    #define USISR sim_io_state.USISR_SIM
+
 
 
 

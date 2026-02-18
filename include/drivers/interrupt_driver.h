@@ -12,6 +12,5 @@
  * @version 1.0
  */
 #pragma once
-
 void interrupt_enable(void);
 void interrupt_disable(void);

@@ -1,3 +1,4 @@
+#pragma once
 typedef enum {
     DEBUG_LAYER_HAL,
     DEBUG_LAYER_DRIVERS,

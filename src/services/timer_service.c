@@ -26,7 +26,7 @@ typedef struct {
 } timer_service_state_t;
 
 static inline bool _is_timer_id_valid(timer_service_id_t id) {
-    return (unsigned)id <= TIMER_SERVICE_ID_MAX;
+    return (unsigned)id < TIMER_SERVICE_ID_MAX;
 }
 
 static inline bool _is_timer_id_free(timer_service_state_t *s, timer_service_id_t id) {

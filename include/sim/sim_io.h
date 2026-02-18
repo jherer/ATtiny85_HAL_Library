@@ -1,6 +1,9 @@
 #pragma once
 #include <stdint.h>
 
+void sei(void);
+void cli(void);
+
 typedef struct {
     // GPIO
     uint8_t PORTB_SIM;
@@ -31,25 +34,31 @@ typedef struct {
     uint8_t ADMUX_SIM;
     uint8_t ADCSRA_SIM;
     uint8_t ADCH_SIM;
+    
+    uint8_t USICR_SIM;
+    uint8_t USIDR_SIM;
+    uint8_t USIBR_SIM;
+    uint8_t USISR_SIM;
 
 } sim_io_state_t;
 
 extern sim_io_state_t sim_io_state;
 
 
-// Timer0
+// TCCR0A
 #define WGM00 0
 #define WGM01 1
 #define COM0B0 4
 #define COM0B1 5
 #define COM0A0 6
 #define COM0A1 7
+// TCCR0B
 #define CS00 0
 #define CS01 1
 #define CS02 2
 #define WGM02 3
 
-// Timer1
+// TCCR1
 #define CS10 0
 #define CS11 1
 #define CS12 2
@@ -58,11 +67,12 @@ extern sim_io_state_t sim_io_state;
 #define COM1A1 5
 #define PWM1A 6
 #define CTC1 7
+// GTCCR
 #define COM1B0 4
 #define COM1B1 5
 #define PWM1B 6
 
-// Interrupt
+// TIMSK
 #define TOIE0 1
 #define TOIE1 2
 #define OCIE0B 3
@@ -72,7 +82,7 @@ extern sim_io_state_t sim_io_state;
 void sei(void);
 void cli(void);
 
-// ADC
+// ADMUX
 #define MUX0 0
 #define MUX1 1
 #define MUX2 2
@@ -81,8 +91,19 @@ void cli(void);
 #define ADLAR 5
 #define REFS0 6
 #define REFS1 7
+// ADCSRA
 #define ADPS0 0
 #define ADPS1 1
 #define ADPS2 2
 #define ADSC 6
 #define ADEN 7
+
+// USICR
+#define USITC 0
+#define USICLK 1
+#define USICS0 2
+#define USICS1 3
+#define USIWM0 4
+#define USIWM1 5
+// USISR
+#define USIOIF 6

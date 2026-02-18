@@ -1,11 +1,11 @@
 /**
  * @file error_code.h
  * @brief Header for error and system status
- * 
+ *
  * This module provides enums for errors that can occur in the driver and service layers
  * Functions that return these can have their values passed up through the app to main,
  * where they will be dealt with.
- * 
+ *
  * @author Joshua Herer
  * @date January 17, 2026
  * @version 1.0

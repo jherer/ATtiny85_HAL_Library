@@ -1,3 +1,4 @@
+#pragma once
 #include <hal/timer1_enums.h>
 #include <stdbool.h>
 #include <stdint.h>

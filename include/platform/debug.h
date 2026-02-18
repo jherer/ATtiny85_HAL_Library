@@ -1,4 +1,4 @@
-#include <sim/sim_debug.h>
+
 
 #ifdef HW
     #define DEBUG_DELAY(...) do {} while (0)
@@ -12,6 +12,7 @@
 
 
 #ifdef SIM
+    #include <sim/sim_debug.h>
     #define DEBUG_DELAY(...) do {_debug_delay_ms(__VA_ARGS__);} while (0)
     #define DEBUG_PRINT(...) do {_debug_print(__VA_ARGS__);} while (0)
     #define DEBUG_PRINTLN(...) do {_debug_println(__VA_ARGS__);} while (0)

@@ -107,7 +107,7 @@ static inline bool _get_duty_256_from_percent(uint8_t percent) {
 }
 
 
-pwm_service_state_t state = {0};
+static pwm_service_state_t state = {0};
 
 
 // Public API
