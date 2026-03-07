@@ -1,13 +1,10 @@
 // #define F_CPU 16000000UL
 
 #include <app/app.h>
-#include <drivers/gpio_driver.h>
-#include <drivers/timer0_driver.h>
-#include <drivers/timer1_driver.h>
-#include <sim/sim_timer0.h>
 #include <platform/io.h>
 #include <platform/debug.h>
 #include <sim/sim_dialogue.h>
+#include <sim/sim_bench.h>
 
 void process_input(char c);
 
@@ -33,17 +30,22 @@ int main(void) {
 
     DEBUG_PAUSE("Press ENTER to run", DEBUG_LAYER_SIM);
     DEBUG_PRINTLN_TITLE("RUN", 45, DEBUG_LAYER_SIM);
-    uint32_t i = 0;
+
+    uint32_t step_num = 0;
     while (1) {
-        DEBUG_PRINTLN_DEC("Step", i++, DEBUG_LAYER_SIM);
+        DEBUG_PRINTLN_DEC("Step", step_num++, DEBUG_LAYER_SIM);
         _print_columns();
+
+        sim_bench_run(step_num);
+
         error_code_t run_err = app_run();
 
         if (run_err != ERROR_OK) {
             DEBUG_PRINTLN_HEX("RUN ERROR", run_err, DEBUG_LAYER_SIM);
         }
         
-        dialogue_run();
+        DEBUG_PRINTLN("", DEBUG_LAYER_SIM);
+        dialogue_run(&sim_io_state);
         DEBUG_PRINTLN("", DEBUG_LAYER_SIM);
         DEBUG_PRINTLN("\n---------------\n", DEBUG_LAYER_SIM);
     }

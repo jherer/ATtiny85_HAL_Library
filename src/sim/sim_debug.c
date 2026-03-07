@@ -232,39 +232,3 @@ uint32_t _debug_query_int(char* message, debug_layer_t layer) {
 void debug_yield_loop(void) {
     _debug_delay_ms(DEBUG_YIELD_LOOP_DELAY_MS);
 }
-
-
-#include <sim/sim_io.h>
-void _debug_dump_registers(sim_io_state_t *sim) {
-}
-/*
-void _debug_dump_registers(sim_io_state_t *sim) {
-    _debug_print("REGISTER DUMP", DEBUG_LAYER_SIM);
-    
-    _debug_print("--GPIO--", DEBUG_LAYER_SIM);
-    _debug_println_bin("    DDRB", sim->DDRB_SIM, DEBUG_LAYER_SIM);
-    _debug_println_bin("    PORTB", sim->PORTB_SIM, DEBUG_LAYER_SIM);
-    _debug_println_bin("    PINB", sim->PINB_SIM, DEBUG_LAYER_SIM);
-    _debug_println("--T0--", DEBUG_LAYER_SIM);
-    _debug_println_bin("    TCCR0A", sim->TCCR0A_SIM, DEBUG_LAYER_SIM);
-    _debug_println_bin("    TCCR0B", sim->TCCR0B_SIM, DEBUG_LAYER_SIM);
-    _debug_println_dec("    TCNT0", sim->TCNT0_SIM, DEBUG_LAYER_SIM);
-    _debug_println_dec("    OCR0A", sim->OCR0A_SIM, DEBUG_LAYER_SIM);
-    _debug_println_dec("    OCR0B", sim->OCR0B_SIM, DEBUG_LAYER_SIM);
-    _debug_println("--T1--", DEBUG_LAYER_SIM);
-    _debug_println_bin("    TCCR1", sim->TCCR1_SIM, DEBUG_LAYER_SIM);
-    _debug_println_bin("    GTCCR", sim->GTCCR_SIM, DEBUG_LAYER_SIM);
-    _debug_println_bin("    PLLCSR", sim->PLLCSR_SIM, DEBUG_LAYER_SIM);
-    _debug_println_dec("    TCNT1", sim->TCNT1_SIM, DEBUG_LAYER_SIM);
-    _debug_println_dec("    OCR1A", sim->OCR1A_SIM, DEBUG_LAYER_SIM);
-    _debug_println_dec("    OCR1B", sim->OCR1B_SIM, DEBUG_LAYER_SIM);
-    _debug_println_dec("    OCR1C", sim->OCR1C_SIM, DEBUG_LAYER_SIM);
-    _debug_println("--INTERRUPT--", DEBUG_LAYER_SIM);
-    _debug_println_bin("    TIMSK", sim->TIMSK_SIM, DEBUG_LAYER_SIM);
-    _debug_println_bin("    SREG", sim->SREG_SIM, DEBUG_LAYER_SIM);
-    _debug_println("--ADC--", DEBUG_LAYER_SIM);
-    _debug_println_bin("    ADMUX", sim->ADMUX_SIM, DEBUG_LAYER_SIM);
-    _debug_println_bin("    ADCSRA", sim->ADCSRA_SIM, DEBUG_LAYER_SIM);
-    _debug_println_bin("    ADCH", sim->ADCH_SIM, DEBUG_LAYER_SIM);
-
-}*/

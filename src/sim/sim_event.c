@@ -6,7 +6,7 @@
 #include <drivers/adc_driver.h>
 
 void sim_event_set_gpio_input(gpio_id_t gpio_id, bool state) {
-    DEBUG_PRINT_DEC("Sim event gpio", (uint16_t)gpio_id, DEBUG_LAYER_SIM);
+    DEBUG_PRINTLN_HEX("Sim event gpio", (uint16_t)gpio_id, DEBUG_LAYER_SIM);
     if (state) {
         switch (gpio_id) {
         case GPIO_B0:
@@ -48,6 +48,7 @@ void sim_event_set_gpio_input(gpio_id_t gpio_id, bool state) {
         default:
             break;
         }
+        DEBUG_PRINTLN("\tInput low", DEBUG_LAYER_SIM);
     }
 }
 

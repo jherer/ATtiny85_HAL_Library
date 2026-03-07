@@ -17,5 +17,4 @@
     uint32_t _debug_query_int(char* message, debug_layer_t layer);
     void _debug_delay_ms(uint32_t ms);
     void _debug_yield_loop(void);
-    void _debug_dump_registers(sim_io_state_t *s);
 #endif
