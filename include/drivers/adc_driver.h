@@ -11,4 +11,6 @@
 error_code_t adc_init(adc_prescaler_t prescaler);
 error_code_t adc_set_prescaler(adc_prescaler_t prescaler);
 error_code_t adc_set_channel(adc_channel_t channel);
-uint8_t adc_read(void);
+error_code_t adc_start_conversion(void);
+uint8_t adc_read_latest(void);
+void adc_fire_conversion_interrupt(void);

@@ -44,7 +44,6 @@ typedef struct {
 
 extern sim_io_state_t sim_io_state;
 
-
 // TCCR0A
 #define WGM00 0
 #define WGM01 1
@@ -95,6 +94,7 @@ void cli(void);
 #define ADPS0 0
 #define ADPS1 1
 #define ADPS2 2
+#define ADIE 3
 #define ADSC 6
 #define ADEN 7
 

@@ -5,26 +5,22 @@
 #include <platform/delay.h>
 
 #define DO_ERROR_BLINK
-static uint8_t const error_led_id = GPIO_B3;
+static uint8_t const error_led_id = GPIO_B1;
 
 #define LONG_MS 1000
 #define SHORT_MS 450
 #define SPACE_MS 150
 
-void _display_error(error_code_t error_code, bool forever)
-{
-    hal_status_interrupt_disable();
+void _display_error(error_code_t error_code, bool forever) {
     hal_gpio_write_ddr(error_led_id, 1);
     hal_gpio_write_port(error_led_id, 0);
 
     uint8_t module_code = (error_code & 0xF0) >> 4; // Which module
     uint8_t submodule_code = (error_code & 0x0F);   // Which error within module
 
-    do
-    {
+    do {
         // First # of blinks: module code
-        for (int i = 0; i < module_code; i++)
-        {
+        for (int i = 0; i < module_code; i++) {
             hal_gpio_write_port(error_led_id, 1);
             delay_msec(SPACE_MS);
             hal_gpio_write_port(error_led_id, 0);
@@ -33,8 +29,7 @@ void _display_error(error_code_t error_code, bool forever)
         delay_msec(SHORT_MS);
 
         // Second # of blinks: submodule code
-        for (int i = 0; i < submodule_code; i++)
-        {
+        for (int i = 0; i < submodule_code; i++) {
             hal_gpio_write_port(error_led_id, 1);
             delay_msec(SPACE_MS);
             hal_gpio_write_port(error_led_id, 0);
@@ -44,12 +39,10 @@ void _display_error(error_code_t error_code, bool forever)
     } while (forever);
 }
 
-void fault_fatal(error_code_t error_code)
-{
+void fault_fatal(error_code_t error_code) {
     _display_error(error_code, true);
 }
 
-void fault_warning(error_code_t error_code)
-{
+void fault_warning(error_code_t error_code) {
     _display_error(error_code, false);
 }

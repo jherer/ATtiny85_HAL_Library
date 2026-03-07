@@ -7,7 +7,7 @@ MODULES = system services drivers hal platform
 # Source file paths
 SRC_DIRS = $(MODULES:%=src/%)
 SRCS = $(foreach dir, $(SRC_DIRS), $(wildcard $(dir)/*.c))
-SRCS += $(wildcard src/app/*.c) # ADD APP SOURCES
+SRCS += src/app/app.c#$(wildcard src/app/*.c) $(wildcard src/app/*/*.c) # ADD APP SOURCES
 
 # Include directory paths
 INC_DIRS = include
@@ -77,17 +77,16 @@ AVRDUDE_FLAGS = -p$(MCU) \
 -c$(ISP) \
 -C$(CONF)
 
-$(TARGET).elf: $(OBJS)
-	$(CC) $(LDFLAGS) $^ -o $@
-
-$(TARGET).hex: $(TARGET).elf
-	$(OBJCOPY) -O ihex $< $@
-
 # Flash firmware to microcontroller
 run: $(TARGET).hex build
 	avrdude $(AVRDUDE_FLAGS) -U flash:w:'$<':a
 
 build: $(TARGET).hex
+$(TARGET).elf: $(OBJS)
+	$(CC) $(LDFLAGS) $^ -o $@
+
+$(TARGET).hex: $(TARGET).elf
+	$(OBJCOPY) -O ihex $< $@
 
 clean:
 	$(RD) $(BUILD_DIR)/*
@@ -106,10 +105,10 @@ MODULES += sim
 SRCS += src/main_sim.c # Add simulation main to sources
 CC = C:/mingw64/bin/gcc.exe # Compiler
 
-build: $(TARGET)
-
 run: $(TARGET)
 	$(TARGET)
+
+build: $(TARGET)
 
 $(TARGET): $(OBJS)
 	$(CC) $(LDFLAGS) $^ -o $@

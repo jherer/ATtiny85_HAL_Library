@@ -46,11 +46,6 @@ static bool _check_layer_enabled(debug_layer_t layer) {
             return true;
         #endif
         break;
-    case DEBUG_LAYER_MAIN:
-        #ifdef ENABLE_DEBUG_LAYER_MAIN
-            return true;
-        #endif
-        break;
     case DEBUG_LAYER_SIM:
         #ifdef ENABLE_DEBUG_LAYER_SIM
             return true;
@@ -81,7 +76,6 @@ static void _layer_indent(debug_layer_t layer) {
         break;
     case DEBUG_LAYER_APP:
         printf("\t\t\t");
-    case DEBUG_LAYER_MAIN:
     case DEBUG_LAYER_SIM:
     case DEBUG_LAYER_SIM_ISR:
     default:
@@ -102,24 +96,18 @@ void _debug_delay_ms(uint32_t time_ms) {
     #endif
 }
 
-void _debug_print(char* message, debug_layer_t layer) {
+void _debug_print(char* message, debug_layer_t layer, bool newline) {
     if (_check_layer_enabled(layer)) {
         _layer_indent(layer);
         printf(message);
+        if (newline) {
+            printf("\n");
+        }
         _debug_delay_ms(DEBUG_PRINT_DELAY_MS);
     }
 }
 
-void _debug_println(char* message, debug_layer_t layer) {
-    if (_check_layer_enabled(layer)) {
-        _layer_indent(layer);
-        printf(message);
-        printf("\n");
-        _debug_delay_ms(DEBUG_PRINT_DELAY_MS);
-    }
-}
-
-void _debug_println_bin(char* message, uint8_t bin, debug_layer_t layer) {
+void _debug_print_bin(char* message, uint8_t bin, debug_layer_t layer, bool newline) {
     if (_check_layer_enabled(layer)) {
         _layer_indent(layer);
         printf(message);
@@ -134,30 +122,38 @@ void _debug_println_bin(char* message, uint8_t bin, debug_layer_t layer) {
                 printf("_");
             }
         }
-        printf("\n");
+        if (newline) {
+            printf("\n");
+        }
         _debug_delay_ms(DEBUG_PRINT_DELAY_MS);
     }
 }
 
-void _debug_println_dec(char* message, uint32_t dec, debug_layer_t layer) {
+void _debug_print_dec(char* message, uint32_t dec, debug_layer_t layer, bool newline) {
     if (_check_layer_enabled(layer)) {
         _layer_indent(layer);
         printf(message);
-        printf(": %d\n", dec);
+        printf(": %d", dec);
+        if (newline) {
+            printf("\n");
+        }
         _debug_delay_ms(DEBUG_PRINT_DELAY_MS);
     }
 }
 
-void _debug_println_hex(char* message, uint8_t hex, debug_layer_t layer) {
+void _debug_print_hex(char* message, uint8_t hex, debug_layer_t layer, bool newline) {
     if (_check_layer_enabled(layer)) {
         _layer_indent(layer);
         printf(message);
-        printf(": x%02X\n", hex);
+        printf(": x%02X", hex);
+        if (newline) {
+            printf("\n");
+        }
         _debug_delay_ms(DEBUG_PRINT_DELAY_MS);
     }
 }
 
-void _debug_println_title(char* message, uint8_t width, debug_layer_t layer) {
+void _debug_print_title(char* message, uint8_t width, debug_layer_t layer, bool newline) {
     if (_check_layer_enabled(layer)) {
         printf("\n\n[");
         //printf(left);
@@ -171,7 +167,10 @@ void _debug_println_title(char* message, uint8_t width, debug_layer_t layer) {
         for (int i = 0; i < width; i++) {
             printf("=");
         }
-        printf("]\n");
+        printf("]");
+        if (newline) {
+            printf("\n");
+        }
         _debug_delay_ms(DEBUG_PRINT_DELAY_MS);
     }
 }
@@ -234,11 +233,15 @@ void debug_yield_loop(void) {
     _debug_delay_ms(DEBUG_YIELD_LOOP_DELAY_MS);
 }
 
+
 #include <sim/sim_io.h>
 void _debug_dump_registers(sim_io_state_t *sim) {
-    _debug_println("REGISTER DUMP", DEBUG_LAYER_SIM);
+}
+/*
+void _debug_dump_registers(sim_io_state_t *sim) {
+    _debug_print("REGISTER DUMP", DEBUG_LAYER_SIM);
     
-    _debug_println("--GPIO--", DEBUG_LAYER_SIM);
+    _debug_print("--GPIO--", DEBUG_LAYER_SIM);
     _debug_println_bin("    DDRB", sim->DDRB_SIM, DEBUG_LAYER_SIM);
     _debug_println_bin("    PORTB", sim->PORTB_SIM, DEBUG_LAYER_SIM);
     _debug_println_bin("    PINB", sim->PINB_SIM, DEBUG_LAYER_SIM);
@@ -264,4 +267,4 @@ void _debug_dump_registers(sim_io_state_t *sim) {
     _debug_println_bin("    ADCSRA", sim->ADCSRA_SIM, DEBUG_LAYER_SIM);
     _debug_println_bin("    ADCH", sim->ADCH_SIM, DEBUG_LAYER_SIM);
 
-}
+}*/
