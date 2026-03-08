@@ -22,8 +22,6 @@ error_code_t app_init(void) {
     DEBUG_PRINTLN("App template", DEBUG_LAYER_APP);
     // Configure drivers and services here
 
-
-    // ASSERT_OK(gpio_write(&state.led1, 1)); // Causes init error (write input)
     interrupt_enable();
     return ERROR_OK;
 }

@@ -14,7 +14,7 @@ typedef struct {
 static app_state_t state = {0};
 
 error_code_t app_init(void) {
-    DEBUG_PRINTLN("GPIO example", DEBUG_LAYER_APP);
+    DEBUG_PRINTLN("GPIO example B", DEBUG_LAYER_APP);
     // Configure drivers and services here
     ASSERT_OK(gpio_create(&state.led0, GPIO_B0, GPIO_MODE_OUTPUT));
     ASSERT_OK(gpio_create(&state.led1, GPIO_B1, GPIO_MODE_OUTPUT));

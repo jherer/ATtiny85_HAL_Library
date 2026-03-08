@@ -6,8 +6,6 @@
 #include <sim/sim_dialogue.h>
 #include <sim/sim_bench.h>
 
-void process_input(char c);
-
 void _print_columns() {
     DEBUG_PRINTLN("SIM\t\t\tAPP\t\t\tSERVICES\t\tDRIVERS\t\t\tHAL", DEBUG_LAYER_SIM);
     DEBUG_PRINTLN("---\t\t\t---\t\t\t--------\t\t-------\t\t\t---", DEBUG_LAYER_SIM);

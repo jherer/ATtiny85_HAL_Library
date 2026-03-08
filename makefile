@@ -1,13 +1,20 @@
 # Build mode: hardware (HW) or simulation (SIM)
 BUILD ?= HW # Hardware build by default
 
-# Names of modules used as source and include directories
-MODULES = system services drivers hal platform
+# Names of modules used as source directories
+SRC_MODULES = system services drivers hal platform
 
+SRC_DIRS = $(SRC_MODULES:%=src/%)
 # Source file paths
-SRC_DIRS = $(MODULES:%=src/%)
 SRCS = $(foreach dir, $(SRC_DIRS), $(wildcard $(dir)/*.c))
-SRCS += src/app/app.c#$(wildcard src/app/*.c) $(wildcard src/app/*/*.c) # ADD APP SOURCES
+
+# Let the user specify an app directory to compile with
+APP_SRCS ?= src/app/
+#APP_SRCS = $(shell find $(APP_DIR) -name '*.c')
+
+SRCS += $(APP_SRCS)
+FILE_EXISTS := $(or $(and $(wildcard $(APP_SRCS)),1),0)
+$(info APP_SRCS: $(APP_SRCS))
 
 # Include directory paths
 INC_DIRS = include
@@ -36,7 +43,7 @@ $(INCFLAGS) \
 -std=gnu11 \
 -MMD -MP \
 
-LDFLAGS =  # Linker flags
+LDFLAGS = # Linker flags
 
 
 # Cross-compatible remove directory command
@@ -68,7 +75,7 @@ CONF	= C:\Users\joshu\AppData\Local\Arduino15\packages\arduino\tools\avrdude\6.3
 CC		= avr-gcc # Compiler command
 
 CFLAGS += -mmcu=$(MCU) # Add HW compiler flags
-LDFLAGS	= -mmcu=$(MCU) # Add HW linker flags
+LDFLAGS	+= -mmcu=$(MCU) # Add HW linker flags
 
  # avrdude flags
 AVRDUDE_FLAGS = -p$(MCU) \
@@ -101,7 +108,7 @@ ifeq ($(BUILD), SIM)
 CFLAGS += -DSIM
 BUILD_DIR = build/sim
 TARGET = $(BUILD_DIR)/sim.exe
-MODULES += sim
+SRC_MODULES += sim
 SRCS += src/main_sim.c # Add simulation main to sources
 CC = C:/mingw64/bin/gcc.exe # Compiler
 
@@ -117,7 +124,6 @@ clean:
 	$(RD) $(BUILD_DIR)/*
 
 endif
-
 
 $(BUILD_DIR)/%.o: %.c
 	@if not exist "$(dir $@)" mkdir "$(dir $@)"
