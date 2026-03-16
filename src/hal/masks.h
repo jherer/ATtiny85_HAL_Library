@@ -14,6 +14,6 @@
 #define MASK_CS1 ((1 << CS13) | (1 << CS12) | (1 << CS11) | (1 << CS10))
 
 #define MASK_USIWM ((1 << USIWM1) | (1 << USIWM0))
-#define MASK_USICS ((1 << USICS0) | (1 << USICS0))
+#define MASK_USICS ((1 << USICS1) | (1 << USICS0))
 #define MASK_USICLK (1 << USICLK)
 #define MASK_USITC (1 << USITC)

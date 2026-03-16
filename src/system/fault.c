@@ -5,7 +5,7 @@
 #include <platform/delay.h>
 
 #define DO_ERROR_BLINK
-static uint8_t const error_led_id = GPIO_B1;
+static uint8_t const error_led_id = GPIO_B4;
 
 #define LONG_MS 1000
 #define SHORT_MS 450

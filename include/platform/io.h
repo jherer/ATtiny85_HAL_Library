@@ -41,6 +41,8 @@
 
     #define SREG sim_io_state.SREG_SIM
     #define TIMSK sim_io_state.TIMSK_SIM
+    #define PCMSK sim_io_state.PCMSK_SIM
+    #define GIMSK sim_io_state.GIMSK_SIM
     
     #define ADMUX sim_io_state.ADMUX_SIM
     #define ADCSRA sim_io_state.ADCSRA_SIM
@@ -50,6 +52,7 @@
     #define USIDR sim_io_state.USIDR_SIM
     #define USIBR sim_io_state.USIBR_SIM
     #define USISR sim_io_state.USISR_SIM
+
 
 
 

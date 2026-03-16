@@ -7,7 +7,7 @@ typedef enum {
     HAL_USI_MODE_3_WIRE,
     HAL_USI_MODE_2_WIRE,
     HAL_USI_NUM_MODES,
-} hal_usi_mode;
+} hal_usi_mode_t;
 
 typedef enum {
     HAL_USI_CLOCK_NONE = 0,
@@ -15,10 +15,11 @@ typedef enum {
     HAL_USI_CLOCK_EXT_RISE_BOTH_EDGE,
     HAL_USI_CLOCK_EXT_FALL_BOTH_EDGE,
     HAL_USI_NUM_CLOCKS,
-} hal_usi_clock;
+} hal_usi_clock_t;
 
-void hal_usi_set_control_register(hal_usi_mode mode, hal_usi_clock clock);
+void hal_usi_set_control_register(hal_usi_mode_t mode, hal_usi_clock_t clock, bool ovf_interrupt_enable);
 uint8_t hal_usi_read_data(void);
 void hal_usi_write_data(uint8_t data);
+void hal_usi_clock_strobe(void);
 bool hal_usi_check_overflow(void);
 void hal_usi_clear_overflow(void);

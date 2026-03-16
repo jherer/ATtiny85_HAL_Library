@@ -29,12 +29,15 @@ typedef struct {
     // STATUS / INTERRUPT
     uint8_t SREG_SIM;
     uint8_t TIMSK_SIM;
+    uint8_t PCMSK_SIM;
+    uint8_t GIMSK_SIM;
 
     // ADC
     uint8_t ADMUX_SIM;
     uint8_t ADCSRA_SIM;
     uint8_t ADCH_SIM;
     
+    // USI
     uint8_t USICR_SIM;
     uint8_t USIDR_SIM;
     uint8_t USIBR_SIM;
@@ -81,6 +84,10 @@ extern sim_io_state_t sim_io_state;
 void sei(void);
 void cli(void);
 
+// GIMSK
+#define INT0 6
+#define PCIE 5
+
 // ADMUX
 #define MUX0 0
 #define MUX1 1
@@ -105,5 +112,15 @@ void cli(void);
 #define USICS1 3
 #define USIWM0 4
 #define USIWM1 5
+#define USIOIE 6
+
 // USISR
 #define USIOIF 6
+
+// PCMSK
+#define PCINT0 0
+#define PCINT1 1
+#define PCINT2 2
+#define PCINT3 3
+#define PCINT4 4
+#define PCINT5 5

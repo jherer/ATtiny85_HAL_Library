@@ -4,7 +4,7 @@
 #include <drivers/adc_driver.h>
 
 ISR(ADC_vect) {
-    adc_fire_conversion_interrupt();
+    adc_fire_conversion_isr();
 }
 
 #endif

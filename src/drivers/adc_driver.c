@@ -58,6 +58,6 @@ uint8_t adc_read_latest(void) {
     return state.latest_reading;
 }
 
-void adc_fire_conversion_interrupt(void) {
+void adc_fire_conversion_isr(void) {
     state.latest_reading = hal_adc_read();
 }
