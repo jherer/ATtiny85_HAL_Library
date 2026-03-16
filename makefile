@@ -8,26 +8,25 @@ SRC_DIRS = $(SRC_MODULES:%=src/%)
 # Source file paths
 SRCS = $(foreach dir, $(SRC_DIRS), $(wildcard $(dir)/*.c))
 
-# Let the user specify an app directory to compile with
-APP_SRCS ?= src/app/
-#APP_SRCS = $(shell find $(APP_DIR) -name '*.c')
-
-SRCS += $(APP_SRCS)
-FILE_EXISTS := $(or $(and $(wildcard $(APP_SRCS)),1),0)
-$(info APP_SRCS: $(APP_SRCS))
-
+# Let the user specify app source directory to compile
+APP_DIR ?= src/examples
+APP_SRCS += $(wildcard $(APP_DIR)/*.c)
 # Include directory paths
 INC_DIRS = include
 
 # Build directory in case build not specified
 BUILD_DIR = build
-
 OBJS = $(SRCS:%.c=$(BUILD_DIR)/%.o)
+OBJS += $(patsubst %.c, $(BUILD_DIR)/app/%.o, $(notdir $(APP_SRCS)))
 DEPS = $(OBJS:%.o=%.d)
 
 # Tell the makefile these are command names, not files
 .PHONY: build run clean
 
+
+$(info APP_DIR: $(APP_DIR))
+$(info SRCS: $(SRCS))
+$(info OBJS: $(OBJS))
 
 # Compiler flags
 F_CPU	= 16000000UL
@@ -125,7 +124,14 @@ clean:
 
 endif
 
+
+# Compile source files from framework
 $(BUILD_DIR)/%.o: %.c
+	@if not exist "$(dir $@)" mkdir "$(dir $@)"
+	$(CC) $(CFLAGS) -c $< -o $@
+
+# Compile source files from user app directory
+$(BUILD_DIR)/app/%.o: $(APP_DIR)/%.c
 	@if not exist "$(dir $@)" mkdir "$(dir $@)"
 	$(CC) $(CFLAGS) -c $< -o $@
 
