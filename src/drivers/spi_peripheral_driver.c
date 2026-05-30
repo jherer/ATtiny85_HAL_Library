@@ -1,5 +1,6 @@
-#include <drivers/spi_peripheral_driver.h>
 #include <drivers/gpio_driver.h>
+#include <drivers/spi_peripheral_driver.h>
+#include <platform/debug.h>
 #include <stdlib.h>
 
 #define DEFAULT_TX 0x59
@@ -9,6 +10,7 @@ typedef struct {
     volatile bool initialized;
     spi_sample_edge_t sample_edge;
     volatile spi_process_callback_t callback;
+    uint8_t last_tx;
 } spi_peripheral_state;
 
 static error_code_t _set_usi_control_reg(spi_sample_edge_t sample_edge, bool enable_interrupt) {
@@ -24,18 +26,18 @@ static error_code_t _set_usi_control_reg(spi_sample_edge_t sample_edge, bool ena
         return ERROR_SPI_PERIPHERAL_BAD_EDGE;
     }
     hal_usi_set_control_register(HAL_USI_MODE_3_WIRE,
-                                usi_clock,
-                                enable_interrupt);
+                                 usi_clock,
+                                 enable_interrupt);
     return ERROR_OK;
 }
-
 
 static spi_peripheral_state state = {0};
 
 error_code_t spi_peripheral_init(spi_sample_edge_t sample_edge) {
+    DEBUG_PRINTLN_HEX("SPI periph. init edge", sample_edge, DEBUG_LAYER_DRIVERS);
     state.sample_edge = sample_edge;
 
-    error_code_t err =_set_usi_control_reg(state.sample_edge, false);
+    error_code_t err = _set_usi_control_reg(state.sample_edge, false);
     if (err != ERROR_OK) return err;
     hal_usi_write_data(DEFAULT_TX);
     hal_usi_clear_overflow();
@@ -44,6 +46,7 @@ error_code_t spi_peripheral_init(spi_sample_edge_t sample_edge) {
 }
 
 error_code_t spi_peripheral_enable_interrupt(void) {
+    DEBUG_PRINTLN("SPI periph. enable isr", DEBUG_LAYER_DRIVERS);
     if (!state.initialized) {
         return ERROR_SPI_PERIPHERAL_UNINIT;
     }
@@ -51,6 +54,7 @@ error_code_t spi_peripheral_enable_interrupt(void) {
 }
 
 error_code_t spi_peripheral_disable_interrupt(void) {
+    DEBUG_PRINTLN("SPI periph. disable isr", DEBUG_LAYER_DRIVERS);
     if (!state.initialized) {
         return ERROR_SPI_PERIPHERAL_UNINIT;
     }
@@ -58,6 +62,7 @@ error_code_t spi_peripheral_disable_interrupt(void) {
 }
 
 error_code_t spi_peripheral_set_process_callback(spi_process_callback_t callback) {
+    DEBUG_PRINTLN("SPI periph. set callback", DEBUG_LAYER_DRIVERS);
     if (!state.initialized) {
         return ERROR_SPI_PERIPHERAL_UNINIT;
     }
@@ -66,6 +71,7 @@ error_code_t spi_peripheral_set_process_callback(spi_process_callback_t callback
 }
 
 error_code_t spi_peripheral_clear(void) {
+    DEBUG_PRINTLN("SPI periph. clear", DEBUG_LAYER_DRIVERS);
     if (!state.initialized) {
         return ERROR_SPI_PERIPHERAL_UNINIT;
     }
@@ -74,13 +80,18 @@ error_code_t spi_peripheral_clear(void) {
 }
 
 void spi_peripheral_fire_isr(void) {
+    DEBUG_PRINTLN("SPI periph. fire ISR", DEBUG_LAYER_DRIVERS);
     if (state.initialized) {
         uint8_t rx = hal_usi_read_data();
         uint8_t tx = DEFAULT_TX;
+        DEBUG_PRINTLN_HEX("    rx", rx, DEBUG_LAYER_DRIVERS);
         if (state.callback != NULL) {
             tx = state.callback(rx);
         }
+        DEBUG_PRINTLN_HEX("    tx", state.last_tx, DEBUG_LAYER_DRIVERS);
+        DEBUG_PRINTLN_HEX("    tx preload", tx, DEBUG_LAYER_DRIVERS);
         hal_usi_write_data(tx);
         hal_usi_clear_overflow();
+        state.last_tx = tx;
     }
 }

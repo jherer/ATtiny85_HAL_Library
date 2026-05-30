@@ -1,9 +1,9 @@
+#include "timer1_driver_internal.h"
+#include <core/error_code.h>
 #include <drivers/timer1_driver.h>
 #include <hal/hal_timer1.h>
-#include "timer1_driver_internal.h"
-#include <stdlib.h>
-#include <core/error_code.h>
 #include <platform/debug.h>
+#include <stdlib.h>
 
 typedef struct {
     bool initialized;
@@ -107,14 +107,12 @@ static void _enable_callback(timer1_state_t *s, timer1_event_t event, bool enabl
     }
 }
 
-
 static timer1_state_t state = {0};
-
 
 // PUBLIC API
 
 error_code_t timer1_init(timer1_mode_t mode) {
-    DEBUG_PRINTLN("t1 init", DEBUG_LAYER_DRIVERS);
+    DEBUG_PRINTLN("T1 init", DEBUG_LAYER_DRIVERS);
     if (!_timer1_is_mode_valid(mode)) {
         return ERROR_TIMER1_ENUM_UNSUPPORTED;
     }
@@ -128,7 +126,7 @@ error_code_t timer1_init(timer1_mode_t mode) {
 }
 
 error_code_t timer1_set_top(uint8_t top) {
-    DEBUG_PRINTLN_DEC("t1 set top", top, DEBUG_LAYER_DRIVERS);
+    DEBUG_PRINTLN_DEC("T1 set top", top, DEBUG_LAYER_DRIVERS);
     if (!state.initialized) {
         return ERROR_TIMER1_UNINIT;
     }
@@ -140,7 +138,7 @@ error_code_t timer1_set_top(uint8_t top) {
 }
 
 error_code_t timer1_pwm_attach(timer1_pwm_channel_t pwm_channel) {
-    DEBUG_PRINTLN("t1 pwm attatch", DEBUG_LAYER_DRIVERS);
+    DEBUG_PRINTLN("T1 pwm attatch", DEBUG_LAYER_DRIVERS);
     if (!state.initialized) {
         return ERROR_TIMER1_UNINIT;
     }
@@ -155,7 +153,7 @@ error_code_t timer1_pwm_attach(timer1_pwm_channel_t pwm_channel) {
 }
 
 error_code_t timer1_pwm_detach(timer1_pwm_channel_t pwm_channel) {
-    DEBUG_PRINTLN("t1 pwm detach", DEBUG_LAYER_DRIVERS);
+    DEBUG_PRINTLN("T1 pwm detach", DEBUG_LAYER_DRIVERS);
     if (!state.initialized) {
         return ERROR_TIMER1_UNINIT;
     }
@@ -167,7 +165,7 @@ error_code_t timer1_pwm_detach(timer1_pwm_channel_t pwm_channel) {
 }
 
 error_code_t timer1_pwm_set_duty(timer1_pwm_channel_t pwm_channel, uint8_t value) {
-    DEBUG_PRINTLN("t1 pwm set duty", DEBUG_LAYER_DRIVERS);
+    DEBUG_PRINTLN("T1 pwm set duty", DEBUG_LAYER_DRIVERS);
     if (!state.initialized) {
         return ERROR_TIMER1_UNINIT;
     }
@@ -183,7 +181,7 @@ error_code_t timer1_pwm_set_duty(timer1_pwm_channel_t pwm_channel, uint8_t value
 }
 
 error_code_t timer1_set_callback(timer1_event_t event, timer1_callback_t callback) {
-    DEBUG_PRINTLN("t1 set callback", DEBUG_LAYER_DRIVERS);
+    DEBUG_PRINTLN("T1 set callback", DEBUG_LAYER_DRIVERS);
     if (!state.initialized) {
         return ERROR_TIMER1_UNINIT;
     }
@@ -198,7 +196,7 @@ error_code_t timer1_set_callback(timer1_event_t event, timer1_callback_t callbac
 }
 
 error_code_t timer1_enable_callback(timer1_event_t event, bool enable) {
-    DEBUG_PRINTLN("t1 enable callback", DEBUG_LAYER_DRIVERS);
+    DEBUG_PRINTLN("T1 enable callback", DEBUG_LAYER_DRIVERS);
     if (!state.initialized) {
         return ERROR_TIMER1_UNINIT;
     }
@@ -213,7 +211,7 @@ error_code_t timer1_enable_callback(timer1_event_t event, bool enable) {
 }
 
 error_code_t timer1_start_clock(timer1_clock_t clock) {
-    DEBUG_PRINTLN("t1 start clock", DEBUG_LAYER_DRIVERS);
+    DEBUG_PRINTLN("T1 start clock", DEBUG_LAYER_DRIVERS);
     if (!state.initialized) {
         return ERROR_TIMER1_UNINIT;
     }
@@ -225,7 +223,7 @@ error_code_t timer1_start_clock(timer1_clock_t clock) {
 }
 
 error_code_t timer1_set_mode(timer1_mode_t mode) {
-    DEBUG_PRINTLN("t1 set mode", DEBUG_LAYER_DRIVERS);
+    DEBUG_PRINTLN("T1 set mode", DEBUG_LAYER_DRIVERS);
     if (!state.initialized) {
         return ERROR_TIMER1_UNINIT;
     }
@@ -243,7 +241,7 @@ error_code_t timer1_cleanup(void) {
     if (!state.initialized) {
         return ERROR_TIMER1_UNINIT;
     }
-    DEBUG_PRINTLN("t1 cleanup", DEBUG_LAYER_DRIVERS);
+    DEBUG_PRINTLN("T1 cleanup", DEBUG_LAYER_DRIVERS);
     _set_clock(&state, TIMER1_CLOCK_OFF);
     _cleanup_pwm(&state);
     _enable_callback(&state, TIMER1_EVENT_COMPA, false);
@@ -263,7 +261,7 @@ void timer1_fire_isr_compa(void) {
 void timer1_fire_isr_compb(void) {
     if (state.compb_callback != NULL) {
         state.compb_callback();
-    } 
+    }
 }
 
 void timer1_fire_isr_ovf(void) {

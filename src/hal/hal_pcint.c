@@ -1,6 +1,6 @@
 #include <hal/hal_pcint.h>
-#include "bitwise.h"
 
+#include "bitwise.h"
 
 void hal_pcint_enable_interrupts() {
     bitwise_write_bit(&GIMSK, PCIE, 1);

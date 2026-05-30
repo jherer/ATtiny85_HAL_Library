@@ -17,7 +17,7 @@ typedef enum {
     HAL_USI_NUM_CLOCKS,
 } hal_usi_clock_t;
 
-void hal_usi_set_control_register(hal_usi_mode_t mode, hal_usi_clock_t clock, bool ovf_interrupt_enable);
+void hal_usi_set_control_register(hal_usi_mode_t mode, hal_usi_clock_t clock, bool ovf_isr_enable);
 uint8_t hal_usi_read_data(void);
 void hal_usi_write_data(uint8_t data);
 void hal_usi_clock_strobe(void);

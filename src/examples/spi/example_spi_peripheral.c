@@ -42,6 +42,7 @@ static app_state_t state = {.last_cs = true};
 uint8_t process_spi(uint8_t rx) {
     //gpio_toggle(&state.debug);
     return rx + 1;
+    gpio_toggle(&state.debug);
 }
 
 void cs_callback() {

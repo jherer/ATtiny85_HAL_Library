@@ -2,6 +2,7 @@
 #include <hal/hal_pcint.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include <platform/debug.h>
 
 typedef struct {
     bool initialized;
@@ -12,6 +13,7 @@ static pcint_state_t state = {0};
 
 
 error_code_t pcint_init() {
+    DEBUG_PRINTLN("PCINT init", DEBUG_LAYER_DRIVERS);
     hal_pcint_disable_pin(0);
     hal_pcint_disable_pin(1);
     hal_pcint_disable_pin(2);
@@ -24,6 +26,7 @@ error_code_t pcint_init() {
 }
 
 error_code_t pcint_cleanup() {
+    DEBUG_PRINTLN("PCINT cleanup", DEBUG_LAYER_DRIVERS);
     hal_pcint_disable_interrupts();
     hal_pcint_disable_pin(0);
     hal_pcint_disable_pin(1);
@@ -34,7 +37,8 @@ error_code_t pcint_cleanup() {
     return ERROR_OK;
 }
 
-error_code_t pcint_enable() {
+error_code_t pcint_enable_interrupts() {
+    DEBUG_PRINTLN("PCINT enable interrupt", DEBUG_LAYER_DRIVERS);
     if (!state.initialized) {
         return ERROR_PCINT_UNINIT;
     }
@@ -42,7 +46,8 @@ error_code_t pcint_enable() {
     return ERROR_OK;
 }
 
-error_code_t pcint_disable() {
+error_code_t pcint_disable_interrupts() {
+    DEBUG_PRINTLN("PCINT disable interrupt", DEBUG_LAYER_DRIVERS);
     if (!state.initialized) {
         return ERROR_PCINT_UNINIT;
     }
@@ -52,6 +57,7 @@ error_code_t pcint_disable() {
 
 
 error_code_t pcint_enable_pin(gpio_id_t gpio_id) {
+    DEBUG_PRINTLN_HEX("PCINT enable pin", gpio_id, DEBUG_LAYER_DRIVERS);
     if (!state.initialized) {
         return ERROR_PCINT_UNINIT;
     }
@@ -78,6 +84,7 @@ error_code_t pcint_enable_pin(gpio_id_t gpio_id) {
 }
 
 error_code_t pcint_disable_pin(gpio_id_t gpio_id) {
+    DEBUG_PRINTLN_HEX("PCINT disable pin", gpio_id, DEBUG_LAYER_DRIVERS);
     if (!state.initialized) {
         return ERROR_PCINT_UNINIT;
     }
@@ -105,6 +112,7 @@ error_code_t pcint_disable_pin(gpio_id_t gpio_id) {
 
 
 error_code_t pcint_set_callback(pcint_callback_t callback) {
+    DEBUG_PRINTLN("PCINT set callback", DEBUG_LAYER_DRIVERS);
     if (!state.initialized) {
         return ERROR_PCINT_UNINIT;
     }
@@ -113,6 +121,7 @@ error_code_t pcint_set_callback(pcint_callback_t callback) {
 }
 
 void pcint_fire_isr() {
+    DEBUG_PRINTLN("PCINT isr fire", DEBUG_LAYER_DRIVERS);
     if (state.callback != NULL) {
         state.callback();
     }

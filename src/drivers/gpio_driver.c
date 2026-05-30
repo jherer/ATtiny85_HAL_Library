@@ -1,11 +1,10 @@
 #include <drivers/gpio_driver.h>
-#include <stdlib.h>
 #include <hal/hal_gpio.h>
-#include <stdlib.h>
 #include <platform/debug.h>
+#include <stdlib.h>
 
 error_code_t gpio_create(gpio_t *gpio, gpio_id_t gpio_id, gpio_mode_t mode) {
-    *gpio = ((gpio_t) {
+    *gpio = ((gpio_t){
         .gpio_id = gpio_id,
         .mode = GPIO_MODE_UNINIT,
         .state = false,
@@ -56,8 +55,8 @@ error_code_t gpio_write(gpio_t *gpio, bool state) {
     }
     switch (gpio->mode) {
     case GPIO_MODE_OUTPUT:
-            hal_gpio_write_port(gpio->gpio_id, state);
-            gpio->state = state;
+        hal_gpio_write_port(gpio->gpio_id, state);
+        gpio->state = state;
         break;
     case GPIO_MODE_INPUT:
     case GPIO_MODE_INPUT_PULLUP:
@@ -88,7 +87,7 @@ error_code_t gpio_toggle(gpio_t *gpio) {
             hal_gpio_write_port(gpio->gpio_id, true);
             gpio->state = true;
         }
-        //hal_gpio_toggle_port(gpio->gpio_id);
+        // hal_gpio_toggle_port(gpio->gpio_id);
         break;
     case GPIO_MODE_INPUT:
     case GPIO_MODE_INPUT_PULLUP:

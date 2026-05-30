@@ -1,5 +1,6 @@
 # Build mode: hardware (HW) or simulation (SIM)
 BUILD ?= HW # Hardware build by default
+SIM_CONFIG ?= 
 
 # Names of modules used as source directories
 SRC_MODULES = system services drivers hal platform
@@ -23,10 +24,9 @@ DEPS = $(OBJS:%.o=%.d)
 # Tell the makefile these are command names, not files
 .PHONY: build run clean
 
-
-$(info APP_DIR: $(APP_DIR))
-$(info SRCS: $(SRCS))
-$(info OBJS: $(OBJS))
+#$(info APP_DIR: $(APP_DIR))
+#$(info SRCS: $(SRCS))
+#$(info OBJS: $(OBJS))
 
 # Compiler flags
 F_CPU	= 16000000UL
@@ -35,6 +35,7 @@ INCFLAGS = $(foreach dir, $(INC_DIRS), -I$(dir))
 CFLAGS	= \
 $(INCFLAGS) \
 -DF_CPU=$(F_CPU) \
+$(foreach def, $(SIM_CONFIG), -D$(def)) \
 -Wall \
 -Wno-unused-function \
 -Wno-unused-variable \

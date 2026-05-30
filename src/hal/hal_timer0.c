@@ -1,33 +1,29 @@
 #include <hal/hal_timer0.h>
-#include <platform/io.h>
 #include <platform/debug.h>
+#include <platform/io.h>
+
 #include "bitwise.h"
 #include "masks.h"
 
 // CONTROL
 
-static uint8_t _build_control_reg_a(uint8_t wgm0_bits, uint8_t com0a_bits, uint8_t com0b_bits)
-{
+static uint8_t _build_control_reg_a(uint8_t wgm0_bits, uint8_t com0a_bits, uint8_t com0b_bits) {
     return ((wgm0_bits << WGM00) & (MASK_WGM0_TCCR0A)) |
            ((com0a_bits << COM0A0) & (MASK_COM0A)) |
            ((com0b_bits << COM0B0) & (MASK_COM0B));
 }
 
-static uint8_t _build_control_reg_b(uint8_t wgm0_bits, uint8_t cs0_bits)
-{
+static uint8_t _build_control_reg_b(uint8_t wgm0_bits, uint8_t cs0_bits) {
     uint8_t wgm02 = 0;
-    if ((wgm0_bits & 0b100) != 0)
-    {
+    if ((wgm0_bits & 0b100) != 0) {
         wgm02 = 1;
     }
     return ((cs0_bits << CS00) & (MASK_CS0)) |
            ((wgm02 << WGM02) & (MASK_WGM0_TCCR0B));
 }
 
-static uint8_t _get_wgm0_bits(timer0_mode_t mode)
-{
-    switch (mode)
-    {
+static uint8_t _get_wgm0_bits(timer0_mode_t mode) {
+    switch (mode) {
     case TIMER0_MODE_NORMAL:
         return 0b000;
     case TIMER0_MODE_CTC:
@@ -42,10 +38,8 @@ static uint8_t _get_wgm0_bits(timer0_mode_t mode)
     }
 }
 
-static uint8_t _get_cs0_bits(timer0_clock_t clock)
-{
-    switch (clock)
-    {
+static uint8_t _get_cs0_bits(timer0_clock_t clock) {
+    switch (clock) {
     case TIMER0_CLOCK_1:
         return 0b001;
     case TIMER0_CLOCK_8:
@@ -64,27 +58,22 @@ static uint8_t _get_cs0_bits(timer0_clock_t clock)
     }
 }
 
-static uint8_t _get_com0a_bits(bool pwm_a)
-{
-    if (pwm_a)
-    {
+static uint8_t _get_com0a_bits(bool pwm_a) {
+    if (pwm_a) {
         return 0b10;
     }
     return 0;
 }
 
-uint8_t _get_com0b_bits(bool pwm_b)
-{
-    if (pwm_b)
-    {
+uint8_t _get_com0b_bits(bool pwm_b) {
+    if (pwm_b) {
         return 0b10;
     }
     return 0;
 }
 
-void hal_timer0_set_control_registers(timer0_mode_t mode, timer0_clock_t clock, bool pwm_a, bool pwm_b)
-{
-    DEBUG_PRINTLN("t0 ctrl", DEBUG_LAYER_HAL);
+void hal_timer0_set_control_registers(timer0_mode_t mode, timer0_clock_t clock, bool pwm_a, bool pwm_b) {
+    DEBUG_PRINTLN("T0 ctrl", DEBUG_LAYER_HAL);
     uint8_t wgm0_bits = _get_wgm0_bits(mode);
     uint8_t cs0_bits = _get_cs0_bits(clock);
     uint8_t com0a_bits = _get_com0a_bits(pwm_a);
@@ -98,53 +87,46 @@ void hal_timer0_set_control_registers(timer0_mode_t mode, timer0_clock_t clock, 
 
 // COUNTER
 
-uint8_t hal_timer0_get_count(void)
-{
+uint8_t hal_timer0_get_count(void) {
     return TCNT0;
 }
 
-void hal_timer0_set_count(uint8_t count)
-{
-    DEBUG_PRINTLN("t0 count", DEBUG_LAYER_HAL);
+void hal_timer0_set_count(uint8_t count) {
+    DEBUG_PRINTLN("T0 count", DEBUG_LAYER_HAL);
     TCNT0 = count;
     DEBUG_PRINTLN_DEC("    TCNT0", TCNT0, DEBUG_LAYER_HAL);
 }
 
 // COMPARE REGISTER
 
-void hal_timer0_set_output_compare_register_a(uint8_t value)
-{
-    DEBUG_PRINTLN("t0 ocr0a", DEBUG_LAYER_HAL);
+void hal_timer0_set_output_compare_register_a(uint8_t value) {
+    DEBUG_PRINTLN("T0 ocr0a", DEBUG_LAYER_HAL);
     OCR0A = value;
     DEBUG_PRINTLN_DEC("    OCR0A", OCR0A, DEBUG_LAYER_HAL);
 }
 
-void hal_timer0_set_output_compare_register_b(uint8_t value)
-{
-    DEBUG_PRINTLN("t0 ocr0b", DEBUG_LAYER_HAL);
+void hal_timer0_set_output_compare_register_b(uint8_t value) {
+    DEBUG_PRINTLN("T0 ocr0b", DEBUG_LAYER_HAL);
     OCR0B = value;
     DEBUG_PRINTLN_DEC("    OCR0B", OCR0B, DEBUG_LAYER_HAL);
 }
 
 // INTERRUPTS
 
-void hal_timer0_enable_interrupt_compa(bool enable)
-{
-    DEBUG_PRINTLN("t0 int compa", DEBUG_LAYER_HAL);
+void hal_timer0_enable_interrupt_compa(bool enable) {
+    DEBUG_PRINTLN("T0 int compa", DEBUG_LAYER_HAL);
     bitwise_write_bit(&TIMSK, OCIE0A, enable);
     DEBUG_PRINTLN_BIN("    TIMSK", TIMSK, DEBUG_LAYER_HAL);
 }
 
-void hal_timer0_enable_interrupt_compb(bool enable)
-{
-    DEBUG_PRINTLN("t0 interrupt compb", DEBUG_LAYER_HAL);
+void hal_timer0_enable_interrupt_compb(bool enable) {
+    DEBUG_PRINTLN("T0 interrupt compb", DEBUG_LAYER_HAL);
     bitwise_write_bit(&TIMSK, OCIE0B, enable);
     DEBUG_PRINTLN_BIN("    TIMSK", TIMSK, DEBUG_LAYER_HAL);
 }
 
-void hal_timer0_enable_interrupt_ovf(bool enable)
-{
-    DEBUG_PRINTLN("t0 interrupt ovf", DEBUG_LAYER_HAL);
+void hal_timer0_enable_interrupt_ovf(bool enable) {
+    DEBUG_PRINTLN("T0 interrupt ovf", DEBUG_LAYER_HAL);
     bitwise_write_bit(&TIMSK, TOIE0, enable);
     DEBUG_PRINTLN_BIN("    TIMSK", TIMSK, DEBUG_LAYER_HAL);
 }

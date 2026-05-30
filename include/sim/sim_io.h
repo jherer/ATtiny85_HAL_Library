@@ -36,7 +36,7 @@ typedef struct {
     uint8_t ADMUX_SIM;
     uint8_t ADCSRA_SIM;
     uint8_t ADCH_SIM;
-    
+
     // USI
     uint8_t USICR_SIM;
     uint8_t USIDR_SIM;

@@ -11,8 +11,8 @@
  */
 
 #pragma once
-#include <core/error_code.h>
 #include <app/assert.h>
+#include <core/error_code.h>
 #include <drivers/interrupt_driver.h>
 
 error_code_t app_init(void);

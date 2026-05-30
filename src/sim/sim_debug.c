@@ -1,67 +1,59 @@
 #include <sim/sim_debug.h>
 #include <stdbool.h>
-
 #include <stdio.h>
 #include <unistd.h>
 
 #ifdef _WIN32
-    #include <conio.h>
+#include <conio.h>
 #endif
 
 // Private helpers
 
 static bool _keys_in_buffer(void) {
-    #ifdef _WIN32
-        return _kbhit();
-    #endif
-return false;
+#ifdef _WIN32
+    return _kbhit();
+#endif
+    return false;
 }
 
 static void _clear_key_buffer(void) {
-    #ifdef _WIN32
-        _getch();
-    #endif
+#ifdef _WIN32
+    _getch();
+#endif
 }
-
 
 static bool _check_layer_enabled(debug_layer_t layer) {
     switch (layer) {
     case DEBUG_LAYER_HAL:
-        #ifdef ENABLE_DEBUG_LAYER_HAL
-            return true;
-        #endif
+#ifdef DISABLE_DEBUG_LAYER_HAL
+        return false;
+#endif
         break;
     case DEBUG_LAYER_DRIVERS:
-        #ifdef ENABLE_DEBUG_LAYER_DRIVERS
-            return true;
-        #endif
+#ifdef DISABLE_DEBUG_LAYER_DRIVERS
+        return false;
+#endif
         break;
     case DEBUG_LAYER_SERVICES:
-        #ifdef ENABLE_DEBUG_LAYER_SERVICES
-            return true;
-        #endif
+#ifdef DISABLE_DEBUG_LAYER_SERVICES
+        return false;
+#endif
         break;
     case DEBUG_LAYER_APP:
-        #ifdef ENABLE_DEBUG_LAYER_APP
-            return true;
-        #endif
+#ifdef DISABLE_DEBUG_LAYER_APP
+        return false;
+#endif
         break;
     case DEBUG_LAYER_SIM:
-        #ifdef ENABLE_DEBUG_LAYER_SIM
-            return true;
-        #endif
-        break;
-    case DEBUG_LAYER_SIM_ISR:
-        #ifdef ENABLE_DEBUG_LAYER_SIM_ISR
-            return true;
-        #endif
+#ifdef DISABLE_DEBUG_LAYER_SIM
+        return false;
+#endif
         break;
     default:
         break;
     }
-    return false;
+    return true;
 }
-
 
 static void _layer_indent(debug_layer_t layer) {
     switch (layer) {
@@ -83,7 +75,6 @@ static void _layer_indent(debug_layer_t layer) {
     }
 }
 
-
 // PUBLIC API
 
 void _debug_init(void) {
@@ -91,12 +82,12 @@ void _debug_init(void) {
 }
 
 void _debug_delay_ms(uint32_t time_ms) {
-    #ifdef DEBUG_DELAY_ENABLED
-        usleep(((uint64_t)time_ms) * 1000);
-    #endif
+#ifdef DEBUG_DELAY_ENABLED
+    usleep(((uint64_t)time_ms) * 1000);
+#endif
 }
 
-void _debug_print(char* message, debug_layer_t layer, bool newline) {
+void _debug_print(char *message, debug_layer_t layer, bool newline) {
     if (_check_layer_enabled(layer)) {
         _layer_indent(layer);
         printf(message);
@@ -107,7 +98,7 @@ void _debug_print(char* message, debug_layer_t layer, bool newline) {
     }
 }
 
-void _debug_print_bin(char* message, uint8_t bin, debug_layer_t layer, bool newline) {
+void _debug_print_bin(char *message, uint8_t bin, debug_layer_t layer, bool newline) {
     if (_check_layer_enabled(layer)) {
         _layer_indent(layer);
         printf(message);
@@ -129,7 +120,7 @@ void _debug_print_bin(char* message, uint8_t bin, debug_layer_t layer, bool newl
     }
 }
 
-void _debug_print_dec(char* message, uint32_t dec, debug_layer_t layer, bool newline) {
+void _debug_print_dec(char *message, uint32_t dec, debug_layer_t layer, bool newline) {
     if (_check_layer_enabled(layer)) {
         _layer_indent(layer);
         printf(message);
@@ -141,7 +132,7 @@ void _debug_print_dec(char* message, uint32_t dec, debug_layer_t layer, bool new
     }
 }
 
-void _debug_print_hex(char* message, uint8_t hex, debug_layer_t layer, bool newline) {
+void _debug_print_hex(char *message, uint8_t hex, debug_layer_t layer, bool newline) {
     if (_check_layer_enabled(layer)) {
         _layer_indent(layer);
         printf(message);
@@ -153,17 +144,17 @@ void _debug_print_hex(char* message, uint8_t hex, debug_layer_t layer, bool newl
     }
 }
 
-void _debug_print_title(char* message, uint8_t width, debug_layer_t layer, bool newline) {
+void _debug_print_title(char *message, uint8_t width, debug_layer_t layer, bool newline) {
     if (_check_layer_enabled(layer)) {
         printf("\n\n[");
-        //printf(left);
+        // printf(left);
         for (int i = 0; i < width; i++) {
             printf("=");
         }
         printf(" ");
         printf(message);
         printf(" ");
-        
+
         for (int i = 0; i < width; i++) {
             printf("=");
         }
@@ -175,7 +166,7 @@ void _debug_print_title(char* message, uint8_t width, debug_layer_t layer, bool 
     }
 }
 
-void _debug_pause(char* message, debug_layer_t layer) {
+void _debug_pause(char *message, debug_layer_t layer) {
     if (_check_layer_enabled(layer)) {
         _layer_indent(layer);
         printf(message);
@@ -193,7 +184,7 @@ void _debug_pause(char* message, debug_layer_t layer) {
     }
 }
 
-char _debug_query_char(char* message, debug_layer_t layer) {
+char _debug_query_char(char *message, debug_layer_t layer) {
     if (_check_layer_enabled(layer)) {
         _layer_indent(layer);
         printf(message);
@@ -212,8 +203,7 @@ char _debug_query_char(char* message, debug_layer_t layer) {
     return 0;
 }
 
-
-uint32_t _debug_query_int(char* message, debug_layer_t layer) {
+uint32_t _debug_query_int(char *message, debug_layer_t layer) {
     if (_check_layer_enabled(layer)) {
         _layer_indent(layer);
         printf(message);

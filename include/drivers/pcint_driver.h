@@ -7,8 +7,8 @@ typedef void (*pcint_callback_t)(void);
 
 error_code_t pcint_init();
 error_code_t pcint_cleanup();
-error_code_t pcint_enable();
-error_code_t pcint_disable();
+error_code_t pcint_enable_interrupts();
+error_code_t pcint_disable_interrupts();
 error_code_t pcint_enable_pin(gpio_id_t gpio_id);
 error_code_t pcint_disable_pin(gpio_id_t gpio_id);
 error_code_t pcint_set_callback(pcint_callback_t callback);
