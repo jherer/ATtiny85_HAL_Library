@@ -1,10 +1,10 @@
 // #define F_CPU 16000000UL
 
 #include <app/app.h>
-#include <platform/io.h>
 #include <platform/debug.h>
+#include <platform/io.h>
 #include <sim/sim_dialogue.h>
-#include <sim/sim_bench.h>
+#include <sim/sim_testbench.h>
 
 void _print_columns() {
     DEBUG_PRINTLN("SIM\t\t\tAPP\t\t\tSERVICES\t\tDRIVERS\t\t\tHAL", DEBUG_LAYER_SIM);
@@ -18,6 +18,8 @@ int main(void) {
     DEBUG_PAUSE("Press ENTER to init", DEBUG_LAYER_SIM);
     DEBUG_PRINTLN_TITLE("INIT", 45, DEBUG_LAYER_SIM);
     _print_columns();
+
+    sim_testbench_init();
 
     error_code_t init_err = app_init();
     if (init_err == ERROR_OK) {
@@ -34,14 +36,14 @@ int main(void) {
         DEBUG_PRINTLN_DEC("Step", step_num++, DEBUG_LAYER_SIM);
         _print_columns();
 
-        sim_bench_run(step_num);
+        sim_testbench_run(step_num);
 
         error_code_t run_err = app_run();
 
         if (run_err != ERROR_OK) {
             DEBUG_PRINTLN_HEX("RUN ERROR", run_err, DEBUG_LAYER_SIM);
         }
-        
+
         DEBUG_PRINTLN("", DEBUG_LAYER_SIM);
         dialogue_run(&sim_io_state);
         DEBUG_PRINTLN("", DEBUG_LAYER_SIM);

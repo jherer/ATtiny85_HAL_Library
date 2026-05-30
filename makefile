@@ -1,6 +1,7 @@
 # Build mode: hardware (HW) or simulation (SIM)
 BUILD ?= HW # Hardware build by default
 SIM_CONFIG ?= 
+TESTBENCH ?= testbench/testbench_default.c
 
 # Names of modules used as source directories
 SRC_MODULES = system services drivers hal platform
@@ -22,7 +23,7 @@ OBJS += $(patsubst %.c, $(BUILD_DIR)/app/%.o, $(notdir $(APP_SRCS)))
 DEPS = $(OBJS:%.o=%.d)
 
 # Tell the makefile these are command names, not files
-.PHONY: build run clean
+.PHONY: build run clean testbench
 
 #$(info APP_DIR: $(APP_DIR))
 #$(info SRCS: $(SRCS))
@@ -43,6 +44,7 @@ $(foreach def, $(SIM_CONFIG), -D$(def)) \
 -std=gnu11 \
 -MMD -MP \
 
+
 LDFLAGS = # Linker flags
 
 
@@ -58,6 +60,7 @@ endif
 #	HARDWARE BUILD
 # ----------------------------
 ifeq ($(BUILD), HW)
+# Define hardware flag ONLY if compiled for hardware
 CFLAGS += -DHW
 BUILD_DIR 	= build/hardware
 TARGET 		= $(BUILD_DIR)/firmware
@@ -105,6 +108,7 @@ endif
 #	SIMULATION BUILD
 # ----------------------------
 ifeq ($(BUILD), SIM)
+# Define sim flag ONLY if compiled for sim
 CFLAGS += -DSIM
 BUILD_DIR = build/sim
 TARGET = $(BUILD_DIR)/sim.exe
@@ -112,16 +116,39 @@ SRC_MODULES += sim
 SRCS += src/main_sim.c # Add simulation main to sources
 CC = C:/mingw64/bin/gcc.exe # Compiler
 
-run: $(TARGET)
+
+run: build
 	$(TARGET)
 
-build: $(TARGET)
+
+# Always recompile testbench
+TESTBENCH_OBJ_DIR = $(BUILD_DIR)/testbench
+TESTBENCH_OBJ = $(TESTBENCH_OBJ_DIR)/current_testbench.o
+OBJS += $(TESTBENCH_OBJ)
+testbench:
+	@if not exist "$(TESTBENCH_OBJ_DIR)" mkdir "$(TESTBENCH_OBJ_DIR)"
+	$(CC) $(CFLAGS) -c $(TESTBENCH) -o $(TESTBENCH_OBJ)
+
+
+build: testbench $(TARGET)
 
 $(TARGET): $(OBJS)
 	$(CC) $(LDFLAGS) $^ -o $@
 
 clean:
 	$(RD) $(BUILD_DIR)/*
+
+
+
+
+
+
+
+# Compile source files from user specified testbench directory
+#$(TESTBENCH_OBJ): $(TESTBENCH)
+#	@if not exist "$(dir $@)" mkdir "$(dir $@)"
+#	$(CC) $(CFLAGS) -c $< -o $@
+
 
 endif
 

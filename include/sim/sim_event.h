@@ -1,3 +1,7 @@
+/*
+    Events used to simulate events and external inputs in testbenches
+*/
+
 #pragma once
 #include <drivers/adc_driver.h>
 #include <hal/gpio_ids.h>
